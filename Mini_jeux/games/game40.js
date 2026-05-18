@@ -2,7 +2,7 @@ import { gameManager } from "../gameCleanup.js";
 
 let game100 = {};
 
-export function startGame100(container, onFinish) {
+export function startGame40(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #1a1a1a; padding: 20px; border-radius: 15px;">
             <div style="font-size: 1.2em; margin-bottom: 10px;">🌀 Mouvements : <span id="moves17" style="color: #2ecc71;">0</span></div>
