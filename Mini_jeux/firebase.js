@@ -1,23 +1,33 @@
-// Initialize Firebase
-// Replace the following with your Firebase project configuration
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+// Stub Firebase connector — remplacez par votre configuration Firebase réelle.
+// Ce fichier évite les erreurs de chargement lorsqu'aucune config n'est fournie.
+
+export function initFirebase(config) {
+  if (!config) {
+    console.warn('firebase.js: aucun config fourni — Firebase non initialisé.');
+    return null;
+  }
+
+  // Si vous souhaitez utiliser Firebase, importez et initialisez ici :
+  // import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+  // const app = initializeApp(config);
+  // return app;
+
+  console.warn('firebase.js: initFirebase appelé, mais l\'initialisation réelle est commentée pour sécurité.');
+  return null;
+}
+
+export async function saveScore(scoreObj) {
+  console.warn('firebase.js: saveScore appelé mais Firebase non configuré.', scoreObj);
+  return false;
+}
+
+export async function fetchTopScores(limit = 10) {
+  console.warn('firebase.js: fetchTopScores appelé mais Firebase non configuré.');
+  return [];
+}
+
+export default {
+  initFirebase,
+  saveScore,
+  fetchTopScores,
 };
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Example function to save data
-export function saveData(collection, data) {
-  return firebase.firestore().collection(collection).add(data);
-}
-
-// Example function to fetch data
-export function fetchData(collection) {
-  return firebase.firestore().collection(collection).get();
-}
