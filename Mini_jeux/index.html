@@ -1,86 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>Gameverse</title>
-  <link rel="stylesheet" href="style.css">
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+ <title>Gameverse</title>
+
+
+ <link rel="stylesheet" href="style.css" />
 </head>
+
+
 <body>
 
 
-<canvas id="galaxyCanvas" aria-hidden="true"></canvas>
+ <canvas id="galaxyCanvas" aria-hidden="true"></canvas>
 
 
-<div class="nebula-layer" aria-hidden="true"></div>
-<div class="stars-layer" aria-hidden="true"></div>
-<div class="twinkle-layer" aria-hidden="true"></div>
+ <div class="nebula-layer" aria-hidden="true"></div>
+ <div class="stars-layer" aria-hidden="true"></div>
+ <div class="twinkle-layer" aria-hidden="true"></div>
 
 
-<div class="side-deco" aria-hidden="true">
-  <div class="side-image side-canard"></div>
-  <div class="side-image side-manette"></div>
-  <div class="side-image side-manette2"></div>
-  <div class="side-image side-bloc"></div>
-  <div class="side-image side-fantome"></div>
-  <div class="side-image side-martien"></div>
-  <div class="side-image side-planete"></div>
-  <div class="side-image side-fusee"></div>
-  <div class="side-image side-pizza"></div>
-  <div class="side-image side-pizza-echo"></div>
-  <div class="side-image side-pacman"></div>
-  <div class="side-image side-pacman-echo"></div>
-  <div class="side-image side-planete-echo"></div>
-  <div class="side-image side-fusee-echo"></div>
-</div>
+ <div class="side-deco" aria-hidden="true">
+   <div class="side-image side-canard"></div>
+   <div class="side-image side-manette"></div>
+   <div class="side-image side-manette2"></div>
+   <div class="side-image side-bloc"></div>
+   <div class="side-image side-fantome"></div>
+   <div class="side-image side-martien"></div>
+   <div class="side-image side-planete"></div>
+   <div class="side-image side-fusee"></div>
+   <div class="side-image side-pizza"></div>
+   <div class="side-image side-pizza-echo"></div>
+   <div class="side-image side-pacman"></div>
+   <div class="side-image side-pacman-echo"></div>
+   <div class="side-image side-planete-echo"></div>
+   <div class="side-image side-fusee-echo"></div>
+ </div>
 
 
-<main id="homeScreen" class="home-screen">
-  <header class="hero">
-    <h1 id="gameLogo" class="game-logo">GAMEVERSE</h1>
-    <p class="tagline">Play Hard. Think Fast.</p>
-  </header>
+ <main id="homeScreen" class="home-screen">
+   <header class="hero">
+     <h1 id="gameLogo" class="game-logo">GAMEVERSE</h1>
+     <p class="tagline">Play Hard. Think Fast.</p>
+   </header>
 
 
-  <section class="mission-card">
-    <p class="mission-title">THINK OUT OF THE BOX</p>
-    <p class="mission-text">Oublie les regles usuelles. Chaque jeu te surprendra.</p>
-  </section>
+   <section class="mission-card">
+     <p class="mission-title">THINK OUT OF THE BOX</p>
+     <p class="mission-text">
+       Oublie les règles usuelles. Chaque jeu te surprendra.
+     </p>
+   </section>
 
 
-  <button id="startBtn" class="start-btn">PLAY</button>
-</main>
+   <button id="startBtn" class="start-btn">
+     PLAY
+   </button>
+ </main>
 
 
-<section id="playArea" class="play-area hidden">
-  <h2 id="levelTitle" class="level-title">GAMEVERSE</h2>
-  <div id="gameContainer"></div>
-  <div id="navControls" class="nav-controls">
-    <button id="prevBtn" style="display:none">Precedent</button>
-    <button id="nextBtn" style="display:none">Passer</button>
-  </div>
-</section>
+ <section id="playArea" class="play-area hidden">
+   <h2 id="levelTitle" class="level-title">GAMEVERSE</h2>
 
 
-<!-- icones flottantes -->
-<div class="floating-icons">
-  <div class="icon neon-controller"></div>
-  <div class="icon neon-duck"></div>
-  <div class="icon neon-pizza"></div>
-  <div class="icon neon-cassette"></div>
-  <div class="icon neon-invader"></div>
-</div>
-
-<!-- Debug overlay to show runtime errors -->
-<div id="debugOverlay" style="display:none;position:fixed;left:8px;right:8px;top:8px;background:rgba(0,0,0,0.85);color:#fff;padding:12px;border-radius:8px;z-index:9999;max-height:40vh;overflow:auto;font-family:monospace;font-size:12px"></div>
+   <div id="gameContainer"></div>
 
 
-<script type="module" src="main.js"></script>
-<script type="module" src="firebase.js"></script>
-<script type="module" src="score.js"></script>
-<script type="module" src="level.js"></script>
-<script type="module" src="gameCleanup.js"></script>
-<!-- Games are dynamically imported by `main.js` when a level starts. -->
+   <div id="navControls" class="nav-controls">
+     <button id="prevBtn" style="display:none">
+       Précédent
+     </button>
+
+
+     <button id="nextBtn" style="display:none">
+       Passer
+     </button>
+   </div>
+ </section>
+
+
+ <!-- Icônes flottantes -->
+ <div class="floating-icons">
+   <div class="icon neon-controller"></div>
+   <div class="icon neon-duck"></div>
+   <div class="icon neon-pizza"></div>
+   <div class="icon neon-cassette"></div>
+   <div class="icon neon-invader"></div>
+ </div>
+
+
+ <!-- UN SEUL SCRIPT -->
+ <script type="module" src="./main.js"></script>
 
 
 </body>
 </html>
-
