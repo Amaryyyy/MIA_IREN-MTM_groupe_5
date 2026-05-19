@@ -1,7 +1,9 @@
 {
-  "root": "Mini_jeux",
+  "builds": [
+    { "src": "Mini_jeux/**", "use": "@vercel/static" }
+  ],
   "routes": [
-    { "src": "^/$", "dest": "/index.html" },
-    { "src": "^/(.*)", "dest": "/$1" }
+    { "src": "^/$", "dest": "/Mini_jeux/index.html" },
+    { "src": "^/(.*)", "dest": "/Mini_jeux/$1" }
   ]
 }

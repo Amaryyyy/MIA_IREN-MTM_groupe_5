@@ -21,10 +21,12 @@ export function startGame1(container, onFinish) {
 
   // --- IMAGES ---
   const pizzaImg = new Image();
-  pizzaImg.src = "assets/pizza.png"; // ta pizza réaliste (celle que tu as envoyée)
+  // Use existing image in assets/images as fallback on deploy
+  pizzaImg.src = "assets/images/fond_pizza.png";
 
   const knifeImg = new Image();
-  knifeImg.src = "assets/knife.png"; // couteau vu du dessus, fond transparent
+  // Fallback knife image (placeholder) — replace with real asset if available
+  knifeImg.src = "assets/images/charger.png";
 
   let cuts = [];
   let mouse = { x: 0, y: 0, isDown: false };

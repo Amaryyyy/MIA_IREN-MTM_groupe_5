@@ -39,7 +39,8 @@ export function startGame14(container, onFinish) {
   const rows = canvas.height / grid;
 
   const snakeImg = new Image();
-  snakeImg.src = "assets/images/serpent.png";
+  // Use an existing image as fallback for the snake graphic
+  snakeImg.src = "assets/images/pink-cosmos.png";
 
   const appleImgs = [new Image(), new Image()];
   appleImgs[0].src = ""; // pas nécessaire, on dessine à la volée
