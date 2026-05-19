@@ -5,8 +5,14 @@ import { gameManager } from "../gameCleanup.js";
 // Crée une carte de memory avec une image au dos et un effet de retournement (flip)
 function createCardElement(cardData) {
   const card = document.createElement("div");
-  card.style.width = "120px";
-  card.style.height = "120px";
+  const cardSize =
+  window.innerWidth < 768
+    ? "72px"
+    : "120px";
+
+card.style.width = cardSize;
+card.style.height = cardSize;
+
   card.style.perspective = "1000px";
   card.style.cursor = "pointer";
 
@@ -130,16 +136,12 @@ function createClickHandler(cardData, cardInner, firstCardRef, secondCardRef, ma
 export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate = [], onGameFinish = null) {
   container.innerHTML = "";
 
-  const title = document.createElement("h2");
-  title.textContent = "Memory";
-  title.style.textAlign = "center";
-  title.style.color = "#4CAF50";
-  title.style.marginBottom = "20px";
-  container.appendChild(title);
-
   const cardContainer = document.createElement("div");
   cardContainer.style.display = "grid";
-  cardContainer.style.gridTemplateColumns = "repeat(4, 1fr)";
+  cardContainer.style.gridTemplateColumns =
+  window.innerWidth < 768
+    ? "repeat(3, 1fr)"
+    : "repeat(4, 1fr)";
   cardContainer.style.gap = "12px";
   cardContainer.style.margin = "20px auto";
   cardContainer.style.maxWidth = "600px";

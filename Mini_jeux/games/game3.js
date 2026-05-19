@@ -1,183 +1,493 @@
+import {
+  getAdaptiveGridSettings,
+  setResponsiveCanvas
+} from "../responsiveUtils.js";
+
 import { gameManager } from "../gameCleanup.js";
 
 export function startGame3(container, onFinish) {
+
+  // =========================
+  // START GAME
+  // =========================
+  gameManager.startGame();
+
+  // =========================
+  // RESET
+  // =========================
   container.innerHTML = "";
+
+  container.style.display = "flex";
+  container.style.flexDirection = "column";
+  container.style.alignItems = "center";
+  container.style.justifyContent = "center";
+  container.style.overflow = "hidden";
+
+  // =========================
+  // RESPONSIVE
+  // =========================
+  const isMobile =
+    window.innerWidth < 768;
+
+  // =========================
+  // CANVAS WRAPPER
+  // =========================
+  const canvasWrapper =
+    document.createElement("div");
+
+  canvasWrapper.style.background =
+    "transparent";
+
+  canvasWrapper.style.padding =
+    "0px";
+
+  canvasWrapper.style.borderRadius =
+    "22px";
+
+  canvasWrapper.style.display =
+    "flex";
+
+  canvasWrapper.style.justifyContent =
+    "center";
+
+  canvasWrapper.style.alignItems =
+    "center";
+
+  canvasWrapper.style.overflow =
+    "hidden";
+
+  canvasWrapper.style.border =
+    "2px solid rgba(139,92,246,0.9)";
   
-  const instructions = document.createElement("div");
-  instructions.style.cssText = `
-    background: rgba(106, 90, 205, 0.2);
-    border: 2px solid #836fff;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 20px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+  canvasWrapper.style.boxShadow = `
+    0 0 5px rgba(139,92,246,0.95),
+    0 0 18px rgba(139,92,246,0.75),
+    0 0 40px rgba(0,170,255,0.35),
+    0 0 80px rgba(140,0,255,0.28),
+    0 0 140px rgba(0,170,255,0.14)
   `;
-  instructions.innerHTML = `
-    <h3 style="margin-top: 0; color: #a28bff;">⚠️ LABYRINTHE INVISIBLE</h3>
-    <p style="font-size: 14px; margin: 10px 0;">Les murs sont cachés. Trouve ton chemin !</p>
-    <div id="controls" style="font-size: 16px; color: #6a5acd; font-weight: bold; margin-top: 10px;"></div>
+  container.appendChild(
+    canvasWrapper
+  );
+
+  // =========================
+  // CANVAS
+  // =========================
+  const canvas =
+    document.createElement("canvas");
+
+  const ctx =
+    canvas.getContext("2d");
+
+  // =========================
+  // RESPONSIVE UTILS
+  // =========================
+  getAdaptiveGridSettings(
+    isMobile ? 26 : 42
+  );
+
+  // =========================
+  // IMMENSE ZONE DE JEU
+  // =========================
+  const canvasWidth = isMobile
+    ? window.innerWidth * 0.96
+    : window.innerWidth * 0.82;
+
+  const canvasHeight = isMobile
+    ? window.innerHeight * 0.72
+    : window.innerHeight * 0.84;
+
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+
+  setResponsiveCanvas(
+    canvas,
+    canvasWidth,
+    canvasHeight
+  );
+
+  // =========================
+  // STYLE
+  // =========================
+  canvas.style.border = "none";
+
+  canvas.style.borderRadius =
+    "18px";
+
+  canvas.style.background =
+    "#050505";
+
+  canvas.style.display =
+    "block";
+
+  canvas.style.width =
+    "100%";
+
+  canvas.style.height =
+    "100%";
+
+  canvas.style.maxWidth =
+    "96vw";
+
+  canvas.style.maxHeight =
+    "90vh";
+
+  canvas.style.boxShadow = `
+    0 0 40px rgba(0,170,255,0.18),
+    0 0 80px rgba(140,0,255,0.14)
   `;
 
-  const canvas = document.createElement("canvas");
-  container.appendChild(instructions);
-  container.appendChild(canvas);
+  canvasWrapper.appendChild(canvas);
 
-  const ctx = canvas.getContext("2d");
-  canvas.width = 700;
-  canvas.height = 700;
+  // =========================
+  // CONFIG
+  // =========================
+  const innerPadding =
+    canvas.width * 0.03;
 
-  const tileSize = 70;
+  const playableWidth =
+    canvas.width - innerPadding ;
 
-  // Labyrinthe très complexe
+  const playableHeight =
+    canvas.height - innerPadding *2;
+
+  const tileSize =
+    Math.min(
+      playableWidth / 10,
+      playableHeight / 10
+    );
+
+  // =========================
+  // LEVEL
+  // =========================
   const level = {
+
     map: [
-      [1,1,1,1,1,1,1,1,1,1],
-      [1,0,1,0,0,0,1,0,0,1],
-      [1,0,1,0,1,0,1,0,1,1],
-      [1,0,0,0,1,0,0,0,0,1],
+      [0,0,1,0,0,0,1,0,0,0],
+      [1,0,1,0,1,0,1,0,1,0],
+      [1,0,0,0,1,0,0,0,0,0],
       [1,1,1,0,1,1,1,1,0,1],
       [1,0,0,0,0,0,0,1,0,1],
       [1,0,1,1,1,1,0,1,0,1],
       [1,0,0,0,0,1,0,0,0,1],
-      [1,1,1,1,0,0,0,1,2,1],
-      [1,1,1,1,1,1,1,1,1,1]
+      [1,1,1,1,0,0,0,1,0,1],
+      [1,0,0,0,0,1,0,0,0,0],
+      [1,1,1,1,1,1,1,1,0,2]
     ],
-    playerStart: { x: 1, y: 1 }
+
+    playerStart: {
+      x: 0,
+      y: 0
+    }
   };
 
-  // Génération de touches ALÉATOIRES (dispersées sur le clavier)
+  // =========================
+  // RANDOM KEYS
+  // =========================
   const allKeys = [
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
-    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
-    'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4',
-    '5', '6', '7', '8', '9', '0'
+    "a","b","c","d","e","f","g","h",
+    "i","j","k","l","m","n","o","p",
+    "q","r","s","t","u","v","w","x",
+    "y","z"
   ];
 
-  function shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  function shuffle(array) {
+
+    const arr = [...array];
+
+    for (
+      let i = arr.length - 1;
+      i > 0;
+      i--
+    ) {
+
+      const j = Math.floor(
+        Math.random() * (i + 1)
+      );
+
+      [arr[i], arr[j]] =
+      [arr[j], arr[i]];
     }
-    return shuffled;
+
+    return arr;
   }
 
-  const shuffledKeys = shuffleArray(allKeys);
+  const shuffled =
+    shuffle(allKeys);
+
   const controls = {
-    up: shuffledKeys[0],
-    down: shuffledKeys[1],
-    left: shuffledKeys[2],
-    right: shuffledKeys[3]
+    up: shuffled[0],
+    down: shuffled[1],
+    left: shuffled[2],
+    right: shuffled[3]
   };
 
-  // Affichage des contrôles
-  document.getElementById('controls').innerHTML = `
-    Haut: <span style="color: #fff; background: #6a5acd; padding: 3px 8px; border-radius: 5px;">${controls.up.toUpperCase()}</span> | 
-    Bas: <span style="color: #fff; background: #6a5acd; padding: 3px 8px; border-radius: 5px;">${controls.down.toUpperCase()}</span> | 
-    Gauche: <span style="color: #fff; background: #6a5acd; padding: 3px 8px; border-radius: 5px;">${controls.left.toUpperCase()}</span> | 
-    Droite: <span style="color: #fff; background: #6a5acd; padding: 3px 8px; border-radius: 5px;">${controls.right.toUpperCase()}</span>
-  `;
+  // =========================
+  // PLAYER
+  // =========================
+  let player = {
+    x: level.playerStart.x,
+    y: level.playerStart.y
+  };
 
-  let player = { ...level.playerStart };
-  let keys = {};
-  let trail = []; // Trace du chemin parcouru
+  let trail = [];
 
-  document.onkeydown = (e) => keys[e.key.toLowerCase()] = true;
-  document.onkeyup = (e) => keys[e.key.toLowerCase()] = false;
+  const keys = {};
 
+  // =========================
+  // KEYBOARD
+  // =========================
+  const keyDownHandler = (e) => {
+    keys[e.key.toLowerCase()] = true;
+  };
+
+  const keyUpHandler = (e) => {
+    keys[e.key.toLowerCase()] = false;
+  };
+
+  gameManager.addEventListener(
+    window,
+    "keydown",
+    keyDownHandler
+  );
+
+  gameManager.addEventListener(
+    window,
+    "keyup",
+    keyUpHandler
+  );
+
+  // =========================
+  // MOVE
+  // =========================
   function move(dx, dy) {
-    let newX = player.x + dx;
-    let newY = player.y + dy;
 
-    if (level.map[newY][newX] !== 1) {
-      // Ajoute la position actuelle à la trace
-      trail.push({ x: player.x, y: player.y });
-      if (trail.length > 15) trail.shift(); // Limite la trace
+    const newX =
+      player.x + dx;
+
+    const newY =
+      player.y + dy;
+
+    if (
+      level.map[newY]?.[newX] !== 1 &&
+      level.map[newY]?.[newX] !== undefined
+    ) {
+
+      trail.push({
+        x: player.x,
+        y: player.y
+      });
+
+      if (trail.length > 15) {
+        trail.shift();
+      }
 
       player.x = newX;
       player.y = newY;
 
-      if (level.map[newY][newX] === 2) {
-        setTimeout(() => {
-          onFinish();
-        }, 300);
+      // WIN
+      if (
+        level.map[newY][newX] === 2
+      ) {
+
+        const timeoutId =
+          setTimeout(() => {
+
+            gameManager.cleanup();
+
+            onFinish();
+
+          }, 300);
+
+        gameManager.addTimeout(
+          timeoutId
+        );
       }
     }
   }
 
+  // =========================
+  // UPDATE
+  // =========================
   function update() {
-    if (keys[controls.up]) move(0, -1);
-    if (keys[controls.down]) move(0, 1);
-    if (keys[controls.left]) move(-1, 0);
-    if (keys[controls.right]) move(1, 0);
+
+    if (keys[controls.up]) {
+      move(0, -1);
+    }
+
+    if (keys[controls.down]) {
+      move(0, 1);
+    }
+
+    if (keys[controls.left]) {
+      move(-1, 0);
+    }
+
+    if (keys[controls.right]) {
+      move(1, 0);
+    }
   }
 
+  // =========================
+  // DRAW
+  // =========================
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Fond noir (rien n'est visible)
-    ctx.fillStyle = "#0a0a0a";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
-    // Départ (vert fluo pulsant)
-    const startX = level.playerStart.x * tileSize;
-    const startY = level.playerStart.y * tileSize;
-    const pulse = Math.sin(Date.now() / 300) * 0.3 + 0.7;
-    
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = "lime";
-    ctx.fillStyle = `rgba(0, 255, 0, ${pulse})`;
-    ctx.fillRect(startX, startY, tileSize, tileSize);
-    ctx.shadowBlur = 0;
+    // BACKGROUND
+    ctx.fillStyle = "#050505";
 
-    // Arrivée (rouge fluo pulsant)
-    for (let y = 0; y < level.map.length; y++) {
-      for (let x = 0; x < level.map[y].length; x++) {
-        if (level.map[y][x] === 2) {
-          const endPulse = Math.sin(Date.now() / 250) * 0.3 + 0.7;
-          ctx.shadowBlur = 25;
-          ctx.shadowColor = "red";
-          ctx.fillStyle = `rgba(255, 0, 0, ${endPulse})`;
-          ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-          ctx.shadowBlur = 0;
+    ctx.fillRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    // START TILE
+    ctx.fillStyle = "#008F4C";
+
+    ctx.fillRect(
+      Math.round(
+        innerPadding +
+        level.playerStart.x * tileSize+40
+      ),
+
+      Math.round(
+        innerPadding +
+        level.playerStart.y * tileSize
+      ),
+
+      tileSize,
+      tileSize
+    );
+
+    // GOAL
+    for (
+      let y = 0;
+      y < level.map.length;
+      y++
+    ) {
+
+      for (
+        let x = 0;
+        x < level.map[y].length;
+        x++
+      ) {
+
+        if (
+          level.map[y][x] === 2
+        ) {
+
+          ctx.fillStyle =
+            "#C1123F";
+
+          ctx.fillRect(
+            Math.round(
+              innerPadding +
+              x * tileSize
+            ),
+
+            Math.round(
+              innerPadding +
+              y * tileSize
+            ),
+
+            tileSize,
+            tileSize
+          );
         }
       }
     }
 
-    // Trace du chemin (s'estompe progressivement)
+    // TRAIL
     trail.forEach((pos, i) => {
-      const alpha = (i / trail.length) * 0.4;
-      ctx.fillStyle = `rgba(131, 111, 255, ${alpha})`;
+
+      ctx.fillStyle = `
+        rgba(
+          131,
+          111,
+          255,
+          ${i / trail.length}
+        )
+      `;
+
       ctx.fillRect(
-        pos.x * tileSize + 15,
-        pos.y * tileSize + 15,
-        tileSize - 30,
-        tileSize - 30
+        Math.round(
+          innerPadding +
+          pos.x * tileSize +
+          tileSize * 0.25
+        ),
+
+        Math.round(
+          innerPadding +
+          pos.y * tileSize +
+          tileSize * 0.25
+        ),
+
+        tileSize * 0.5,
+        tileSize * 0.5
       );
     });
 
-    // Joueur (avec halo lumineux)
-    ctx.shadowBlur = 30;
-    ctx.shadowColor = "#836fff";
+    // PLAYER
+    ctx.shadowColor = "#8b5cf6";
+
+    ctx.shadowBlur = 25;
+
     ctx.fillStyle = "#a28bff";
+
     ctx.beginPath();
+
     ctx.arc(
-      player.x * tileSize + tileSize / 2,
-      player.y * tileSize + tileSize / 2,
+      Math.round(
+        innerPadding +
+        player.x * tileSize +40+
+        tileSize / 2
+      ),
+
+      Math.round(
+        innerPadding +
+        player.y * tileSize +
+        tileSize / 2
+      ),
+
       tileSize / 3,
+
       0,
       Math.PI * 2
     );
+
     ctx.fill();
+
     ctx.shadowBlur = 0;
   }
 
+  // =========================
+  // LOOP
+  // =========================
   function loop() {
+
+    if (!gameManager.isRunning) {
+      return;
+    }
+
     update();
+
     draw();
-    requestAnimationFrame(loop);
+
+    const frameId =
+      requestAnimationFrame(loop);
+
+    gameManager.addAnimationFrame(
+      frameId
+    );
   }
 
   loop();
