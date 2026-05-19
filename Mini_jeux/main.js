@@ -1,4 +1,4 @@
-import { getAllLevels } from "./level.js";
+import { getAllLevels, getLevelTitle } from "./level.js";
 import { gameManager } from "./gameCleanup.js";
 
 
@@ -219,7 +219,7 @@ async function loadLevel() {
  }
 
 
- levelTitle.textContent = `Niveau ${currentLevel + 1} - ${currentLevelData.game}`;
+ levelTitle.textContent = getLevelTitle(currentLevel) || `Game ${currentLevel + 1} - ${currentLevelData.game}`;
  container.innerHTML = "";
 
 

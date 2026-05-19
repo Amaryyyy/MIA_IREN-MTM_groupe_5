@@ -1,6 +1,6 @@
 import { gameManager } from "../gameCleanup.js"; 
 
-let game100 = {};
+let game40 = {};
 
 export function startGame40(container, onFinish) {
     container.innerHTML = `
@@ -14,7 +14,7 @@ export function startGame40(container, onFinish) {
     const canvas = container.querySelector("#cubeCanvas");
     const ctx = canvas.getContext("2d");
 
-    game100 = {
+    game40 = {
         ctx,
         canvas,
         size: 4,
@@ -41,7 +41,7 @@ function initCube() {
 
     for (let row = 0; row < 4; row++) {
         for (let col = 0; col < 4; col++) {
-            game100.grid[row * 4 + col] = colors[row];
+            game40.grid[row * 4 + col] = colors[row];
         }
     }
 }
@@ -64,30 +64,30 @@ function mixCube() {
 /* ---------- DRAG ---------- */
 
 function startDrag(e) {
-    const rect = game100.canvas.getBoundingClientRect();
+    const rect = game40.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    const x = Math.floor(mx / game100.tileSize);
-    const y = Math.floor(my / game100.tileSize);
+    const x = Math.floor(mx / game40.tileSize);
+    const y = Math.floor(my / game40.tileSize);
 
-    game100.dragging = true;
-    game100.dragStart = { x, y, mx, my };
+    game40.dragging = true;
+    game40.dragStart = { x, y, mx, my };
 }
 
 function endDrag(e) {
-    if (!game100.dragging) return;
-    game100.dragging = false;
+    if (!game40.dragging) return;
+    game40.dragging = false;
 
-    const rect = game100.canvas.getBoundingClientRect();
+    const rect = game40.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    const dx = mx - game100.dragStart.mx;
-    const dy = my - game100.dragStart.my;
+    const dx = mx - game40.dragStart.mx;
+    const dy = my - game40.dragStart.my;
 
-    const row = game100.dragStart.y;
-    const col = game100.dragStart.x;
+    const row = game40.dragStart.y;
+    const col = game40.dragStart.x;
 
     // Horizontal → ligne
     if (Math.abs(dx) > Math.abs(dy)) {
@@ -105,16 +105,16 @@ function endDrag(e) {
 
 function slideRow(row, dir, countMove) {
     const start = row * 4;
-    const line = game100.grid.slice(start, start + 4);
+    const line = game40.grid.slice(start, start + 4);
 
     if (dir === 1) line.unshift(line.pop());
     else line.push(line.shift());
 
-    for (let i = 0; i < 4; i++) game100.grid[start + i] = line[i];
+    for (let i = 0; i < 4; i++) game40.grid[start + i] = line[i];
 
     if (countMove) {
-        game100.moves++;
-        document.getElementById("moves17").textContent = game100.moves;
+        game40.moves++;
+        document.getElementById("moves17").textContent = game40.moves;
         checkCubeWin();
     }
 
@@ -125,16 +125,16 @@ function slideRow(row, dir, countMove) {
 
 function slideCol(col, dir, countMove) {
     const colVals = [];
-    for (let i = 0; i < 4; i++) colVals.push(game100.grid[i * 4 + col]);
+    for (let i = 0; i < 4; i++) colVals.push(game40.grid[i * 4 + col]);
 
     if (dir === 1) colVals.unshift(colVals.pop());
     else colVals.push(colVals.shift());
 
-    for (let i = 0; i < 4; i++) game100.grid[i * 4 + col] = colVals[i];
+    for (let i = 0; i < 4; i++) game40.grid[i * 4 + col] = colVals[i];
 
     if (countMove) {
-        game100.moves++;
-        document.getElementById("moves17").textContent = game100.moves;
+        game40.moves++;
+        document.getElementById("moves17").textContent = game40.moves;
         checkCubeWin();
     }
 
@@ -146,28 +146,28 @@ function slideCol(col, dir, countMove) {
 function checkCubeWin() {
     for (let row = 0; row < 4; row++) {
         const start = row * 4;
-        const color = game100.grid[start];
+        const color = game40.grid[start];
 
         for (let i = 0; i < 4; i++) {
-            if (game100.grid[start + i] !== color) return;
+            if (game40.grid[start + i] !== color) return;
         }
     }
 
     document.getElementById("msg17").textContent = "🎉 Bravo ! Toutes les lignes sont monochromes !";
-    gameManager.addTimeout(setTimeout(game100.onFinish, 1500));
+    gameManager.addTimeout(setTimeout(game40.onFinish, 1500));
 }
 
 /* ---------- RENDER ---------- */
 
 function renderCube() {
-    const ctx = game100.ctx;
+    const ctx = game40.ctx;
     ctx.fillStyle = "#2c3e50";
     ctx.fillRect(0, 0, 360, 360);
 
     for (let i = 0; i < 16; i++) {
-        const color = game100.grid[i];
-        const x = (i % 4) * game100.tileSize;
-        const y = Math.floor(i / 4) * game100.tileSize;
+        const color = game40.grid[i];
+        const x = (i % 4) * game40.tileSize;
+        const y = Math.floor(i / 4) * game40.tileSize;
 
         ctx.fillStyle = color;
         ctx.fillRect(x + 5, y + 5, 80, 80);
