@@ -276,6 +276,12 @@ button {
   animation: rise-in 1.4s ease both;
 }
 
+/* Ensure PLAY button is above decorative elements and clickable */
+.start-btn {
+  z-index: 50;
+  pointer-events: auto;
+}
+
 .start-btn::after {
   content: "";
   position: absolute;

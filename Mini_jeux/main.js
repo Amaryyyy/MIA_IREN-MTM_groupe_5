@@ -218,6 +218,16 @@ function startGameFlow() {
   loadLevel();
 }
 
+// provide a visible feedback immediately when play is clicked
+startBtn.addEventListener('click', () => {
+  try {
+    startBtn.textContent = 'Loading...';
+    startBtn.disabled = true;
+  } catch (e) {
+    // ignore
+  }
+});
+
 function nextLevel() {
   if (currentLevel < levels.length - 1) {
     currentLevel += 1;
