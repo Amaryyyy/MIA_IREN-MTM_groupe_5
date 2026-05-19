@@ -1,100 +1,107 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
- <title>Gameverse</title>
-
-
- <link rel="stylesheet" href="style.css" />
+  <title>Gameverse</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
+<canvas id="galaxyCanvas" aria-hidden="true"></canvas>
 
- <canvas id="galaxyCanvas" aria-hidden="true"></canvas>
+<div class="nebula-layer" aria-hidden="true"></div>
+<div class="stars-layer" aria-hidden="true"></div>
+<div class="twinkle-layer" aria-hidden="true"></div>
 
+<div class="side-deco" aria-hidden="true">
+  <div class="side-image side-canard"></div>
+  <div class="side-image side-manette"></div>
+  <div class="side-image side-manette2"></div>
+  <div class="side-image side-bloc"></div>
+  <div class="side-image side-fantome"></div>
+  <div class="side-image side-martien"></div>
+  <div class="side-image side-planete"></div>
+  <div class="side-image side-fusee"></div>
+  <div class="side-image side-pizza"></div>
+  <div class="side-image side-pizza-echo"></div>
+  <div class="side-image side-pacman"></div>
+  <div class="side-image side-pacman-echo"></div>
+  <div class="side-image side-planete-echo"></div>
+  <div class="side-image side-fusee-echo"></div>
+</div>
 
- <div class="nebula-layer" aria-hidden="true"></div>
- <div class="stars-layer" aria-hidden="true"></div>
- <div class="twinkle-layer" aria-hidden="true"></div>
+<main id="homeScreen" class="home-screen">
+  <header class="hero">
+    <h1 id="gameLogo" class="game-logo">GAMEVERSE</h1>
+    <p class="tagline">Play Hard. Think Fast.</p>
+  </header>
 
+  <section class="mission-card">
+    <p class="mission-title">THINK OUT OF THE BOX</p>
+    <p class="mission-text">Oublie les regles usuelles. Chaque jeu te surprendra.</p>
+  </section>
 
- <div class="side-deco" aria-hidden="true">
-   <div class="side-image side-canard"></div>
-   <div class="side-image side-manette"></div>
-   <div class="side-image side-manette2"></div>
-   <div class="side-image side-bloc"></div>
-   <div class="side-image side-fantome"></div>
-   <div class="side-image side-martien"></div>
-   <div class="side-image side-planete"></div>
-   <div class="side-image side-fusee"></div>
-   <div class="side-image side-pizza"></div>
-   <div class="side-image side-pizza-echo"></div>
-   <div class="side-image side-pacman"></div>
-   <div class="side-image side-pacman-echo"></div>
-   <div class="side-image side-planete-echo"></div>
-   <div class="side-image side-fusee-echo"></div>
- </div>
+  <button id="startBtn" class="start-btn">PLAY</button>
+</main>
 
+<section id="playArea" class="play-area hidden">
+  <h2 id="levelTitle" class="level-title">GAMEVERSE</h2>
+  <div id="gameContainer"></div>
+  <div id="navControls" class="nav-controls">
+    <button id="prevBtn" style="display:none">Precedent</button>
+    <button id="nextBtn" style="display:none">Passer</button>
+  </div>
+</section>
 
- <main id="homeScreen" class="home-screen">
-   <header class="hero">
-     <h1 id="gameLogo" class="game-logo">GAMEVERSE</h1>
-     <p class="tagline">Play Hard. Think Fast.</p>
-   </header>
+<!-- icones flottantes -->
+<div class="floating-icons">
+  <div class="icon neon-controller"></div>
+  <div class="icon neon-duck"></div>
+  <div class="icon neon-pizza"></div>
+  <div class="icon neon-cassette"></div>
+  <div class="icon neon-invader"></div>
+</div>
 
-
-   <section class="mission-card">
-     <p class="mission-title">THINK OUT OF THE BOX</p>
-     <p class="mission-text">
-       Oublie les règles usuelles. Chaque jeu te surprendra.
-     </p>
-   </section>
-
-
-   <button id="startBtn" class="start-btn">
-     PLAY
-   </button>
- </main>
-
-
- <section id="playArea" class="play-area hidden">
-   <h2 id="levelTitle" class="level-title">GAMEVERSE</h2>
-
-
-   <div id="gameContainer"></div>
-
-
-   <div id="navControls" class="nav-controls">
-     <button id="prevBtn" style="display:none">
-       Précédent
-     </button>
-
-
-     <button id="nextBtn" style="display:none">
-       Passer
-     </button>
-   </div>
- </section>
-
-
- <!-- Icônes flottantes -->
- <div class="floating-icons">
-   <div class="icon neon-controller"></div>
-   <div class="icon neon-duck"></div>
-   <div class="icon neon-pizza"></div>
-   <div class="icon neon-cassette"></div>
-   <div class="icon neon-invader"></div>
- </div>
-
-
- <!-- UN SEUL SCRIPT -->
- <script type="module" src="./main.js"></script>
-
+<script type="module" src="main.js"></script>
+<script type="module" src="firebase.js"></script>
+<script type="module" src="score.js"></script>
+<script type="module" src="level.js"></script>
+<script type="module" src="gameCleanup.js"></script>
+<script type="module" src="games/game1.js"></script>
+<script type="module" src="games/game2.js"></script>
+<script type="module" src="games/game3.js"></script>
+<script type="module" src="games/game4.js"></script>
+<script type="module" src="games/game5.js"></script>
+<script type="module" src="games/game6.js"></script>
+<script type="module" src="games/game7.js"></script>
+<script type="module" src="games/game8.js"></script>
+<script type="module" src="games/game9.js"></script>
+<script type="module" src="games/game10.js"></script>
+<script type="module" src="games/game11.js"></script>
+<script type="module" src="games/game12.js"></script>
+<script type="module" src="games/game13.js"></script>
+<script type="module" src="games/game14.js"></script>
+<script type="module" src="games/game15.js"></script>
+<script type="module" src="games/game16.js"></script>
+<script type="module" src="games/game17.js"></script>
+<script type="module" src="games/game18.js"></script>
+<script type="module" src="games/game19.js"></script>
+<script type="module" src="games/game20.js"></script>
+<script type="module" src="games/game21.js"></script>
+<script type="module" src="games/game22.js"></script>
+<script type="module" src="games/game23.js"></script>
+<script type="module" src="games/game24.js"></script>
+<script type="module" src="games/game25.js"></script>
+<script type="module" src="games/game26.js"></script>
+<script type="module" src="games/game27.js"></script>
+<script type="module" src="games/game28.js"></script>
+<script type="module" src="games/game29.js"></script>
+<script type="module" src="games/game30.js"></script>
+<script type="module" src="games/game31.js"></script>
+<script type="module" src="games/game32.js"></script>
+<script type="module" src="games/game33.js"></script>
+<script type="module" src="games/game34.js"></script>
+<script type="module" src="games/game35.js"></script>
+<script type="module" src="games/game36.js"></script>
 
 </body>
 </html>

@@ -20,12 +20,13 @@
 html,
 body {
   margin: 0;
-  min-height: 100%;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   position: relative;
-  overflow-x: hidden;
   color: var(--text-main);
   font-family: "Honk", system-ui;
   font-optical-sizing: auto;
@@ -34,6 +35,8 @@ body {
   background: radial-gradient(circle at 15% 10%, #294ed2 0%, transparent 40%),
     radial-gradient(circle at 85% 20%, #4f1eca 0%, transparent 35%),
     linear-gradient(160deg, var(--bg-deep), var(--bg-mid) 48%, var(--bg-neon));
+  height: 100vh;
+  width: 100vw;
 }
 
 #galaxyCanvas {
@@ -160,10 +163,9 @@ body {
   animation: twinkle-static-c 7.9s ease-in-out infinite;
   animation-delay: -3.7s;
 }
+
 .home-screen,
 .play-area {
-  position: relative;
-  z-index: 5;
   width: min(900px, calc(100% - 48px));
   margin: 0 auto;
 }
@@ -193,7 +195,6 @@ body {
     0 0 34px rgba(158, 99, 255, 1);
   position: relative;
 }
-
 
 .game-logo::after {
   content: "";
@@ -229,7 +230,6 @@ body {
     0 0 26px rgba(46, 232, 255, 0.2);
   backdrop-filter: blur(4px);
   animation: rise-in 1.15s ease both;
-
 }
 
 .mission-title {
@@ -274,12 +274,6 @@ button {
   position: relative;
   overflow: hidden;
   animation: rise-in 1.4s ease both;
-}
-
-/* Ensure PLAY button is above decorative elements and clickable */
-.start-btn {
-  z-index: 50;
-  pointer-events: auto;
 }
 
 .start-btn::after {
@@ -340,7 +334,7 @@ button:active {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: -1;
 }
 
 .side-image {
@@ -351,49 +345,8 @@ button:active {
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.9;
-  pointer-events: auto;
-  cursor: pointer;
-  transition: opacity 0.18s ease, filter 0.18s ease;
   filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
 }
-
-.side-image:hover {
-  opacity: 1;
-  filter:
-    drop-shadow(0 0 14px rgba(255, 255, 255, 0.72))
-    drop-shadow(0 0 22px rgba(46, 232, 255, 0.56));
-}
-
-.side-image.side-image-burst {
-  animation: side-image-pulse 0.38s ease-out 1;
-}
-
-.star-rain-layer {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 30;
-}
-
-.star-rain-particle {
-  --star-size: 10px;
-  --star-fall-duration: 1400ms;
-  --star-fall-delay: 0ms;
-  --star-drift: 0px;
-  position: absolute;
-  width: var(--star-size);
-  height: var(--star-size);
-  opacity: 0;
-  clip-path: polygon(50% 0%, 61% 36%, 98% 35%, 69% 57%, 79% 92%, 50% 72%, 21% 92%, 31% 57%, 2% 35%, 39% 36%);
-  background: linear-gradient(165deg, #ffffff 0%, #ffe889 42%, #2ee8ff 100%);
-  filter:
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))
-    drop-shadow(0 0 10px rgba(46, 232, 255, 0.7));
-  animation: star-rain-fall var(--star-fall-duration) cubic-bezier(0.2, 0.8, 0.25, 1) var(--star-fall-delay) forwards;
-}
-
-/* Position and transform are managed in main.js (decorativeLayout). */
 
 .side-canard {
   background-image: url("./assets/images/Fond_canard.png");
@@ -499,43 +452,58 @@ button:active {
   clip-path: polygon(66% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 66% 66%);
 }
 
+/* ===== PLAY AREA - OPTIMISÉ POUR ZÉRO SCROLL ===== */
 .play-area {
-  padding-top: 42px;
-  padding-bottom: 48px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .level-title {
-  margin: 0 0 14px;
-  font-size: clamp(1.8rem, 6vw, 3rem);
+  margin: 4px 0;
+  padding: 0;
+  font-size: clamp(1.2rem, 4vw, 2rem);
   color: #dce8ff;
   text-shadow: 0 0 8px rgba(46, 232, 255, 0.5);
+  flex-shrink: 0;
 }
 
+/* ===== GAME CONTAINER - ZÉRO SCROLL ===== */
 #gameContainer {
-  margin-top: 14px;
-  padding: 20px;
-  border: 1px solid rgba(158, 99, 255, 0.5);
-  border-radius: 15px;
-  background: var(--panel);
-  box-shadow: 0 0 20px rgba(158, 99, 255, 0.4), inset 0 0 22px rgba(17, 17, 39, 0.6);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  overflow: hidden;
+  margin: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 0;
 }
 
 .nav-controls {
-  margin-top: 18px;
+  margin: 4px 0;
+  padding: 0;
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .nav-controls button {
-  padding: 10px 14px;
-  font-size: 0.88rem;
+  padding: 6px 10px;
+  font-size: 0.75rem;
 }
 
 canvas {
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
 
 .colorBox {
@@ -573,12 +541,6 @@ body.in-game .start-btn {
   filter: blur(0.6px);
 }
 
-body.in-game .side-image {
-  pointer-events: none;
-  cursor: default;
-}
-
-/* icones flottantes */
 .floating-icons {
   position: fixed;
   inset: 0;
@@ -597,8 +559,6 @@ body.in-game .side-image {
   filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
 }
 
-
-
 .neon-controller { background-image: url('./assets/neon/controller.png'); top: 12%; left: 18%; }
 .neon-duck       { background-image: url('./assets/neon/duck.png');       top: 42%; left: 8%; }
 .neon-pizza      { background-image: url('./assets/neon/pizza.png');      top: 25%; left: 22%; }
@@ -610,45 +570,9 @@ body.in-game .side-image {
   50% { transform: translateY(-12px); }
 }
 
-@keyframes side-image-pulse {
-  0% {
-    filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
-  }
-  35% {
-    filter:
-      drop-shadow(0 0 16px rgba(255, 255, 255, 0.9))
-      drop-shadow(0 0 30px rgba(46, 232, 255, 0.85));
-  }
-  100% {
-    filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
-  }
-}
-
-@keyframes star-rain-fall {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7);
-    opacity: 0;
-  }
-  12% {
-    opacity: 1;
-  }
-  82% {
-    opacity: 0.9;
-  }
-  100% {
-    transform: translate3d(var(--star-drift), 115vh, 0) rotate(540deg) scale(1.08);
-    opacity: 0;
-  }
-}
-
-
 @keyframes starlight {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-420px);
-  }
+  from { transform: translateY(0); }
+  to { transform: translateY(-420px); }
 }
 
 @keyframes meteor {
@@ -656,12 +580,8 @@ body.in-game .side-image {
     transform: translate3d(0, 0, 0) rotate(-26deg);
     opacity: 0;
   }
-  10% {
-    opacity: 1;
-  }
-  60% {
-    opacity: 1;
-  }
+  10% { opacity: 1; }
+  60% { opacity: 1; }
   100% {
     transform: translate3d(120vw, 42vh, 0) rotate(-26deg);
     opacity: 0;
@@ -669,66 +589,31 @@ body.in-game .side-image {
 }
 
 @keyframes twinkle-static-a {
-  0%,
-  100% {
-    opacity: 0.36;
-  }
-  16% {
-    opacity: 0.62;
-  }
-  39% {
-    opacity: 0.44;
-  }
-  67% {
-    opacity: 0.74;
-  }
-  86% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 0.36; }
+  16% { opacity: 0.62; }
+  39% { opacity: 0.44; }
+  67% { opacity: 0.74; }
+  86% { opacity: 0.5; }
 }
 
 @keyframes twinkle-static-b {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  23% {
-    opacity: 0.58;
-  }
-  51% {
-    opacity: 0.4;
-  }
-  79% {
-    opacity: 0.66;
-  }
-  92% {
-    opacity: 0.46;
-  }
+  0%, 100% { opacity: 0.3; }
+  23% { opacity: 0.58; }
+  51% { opacity: 0.4; }
+  79% { opacity: 0.66; }
+  92% { opacity: 0.46; }
 }
 
 @keyframes twinkle-static-c {
-  0%,
-  100% {
-    opacity: 0.28;
-  }
-  12% {
-    opacity: 0.5;
-  }
-  36% {
-    opacity: 0.34;
-  }
-  61% {
-    opacity: 0.6;
-  }
-  84% {
-    opacity: 0.42;
-  }
+  0%, 100% { opacity: 0.28; }
+  12% { opacity: 0.5; }
+  36% { opacity: 0.34; }
+  61% { opacity: 0.6; }
+  84% { opacity: 0.42; }
 }
 
 @keyframes shine {
-  to {
-    transform: translateX(130%);
-  }
+  to { transform: translateX(130%); }
 }
 
 @keyframes rise-in {
@@ -743,28 +628,15 @@ body.in-game .side-image {
 }
 
 @keyframes float-piece {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes logo-glitch {
-  0% {
-    transform: translateX(0);
-  }
-  30% {
-    transform: translateX(-2px);
-  }
-  60% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
 }
 
 @media (max-width: 900px) {
@@ -787,16 +659,7 @@ body.in-game .side-image {
     width: calc(100% - 24px);
   }
 
-  #gameContainer {
-    padding: 14px;
-  }
-
   .mission-text {
     font-size: 1.3rem;
   }
-}
-
-/* Debug overlay styles */
-#debugOverlay {
-  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
 }

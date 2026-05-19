@@ -21,20 +21,28 @@ export function createRebusDisplay(rebus) {
 
 export function createInputField() {
     const input = document.createElement("input");
+
     input.placeholder = "Tape ta réponse...";
     input.style.margin = "10px auto";
     input.style.display = "block";
     input.style.fontSize = "18px";
     input.style.padding = "10px";
     input.style.width = "60%";
-    input.style.backgroundColor = "#4B0082";
+
+    // STYLE NÉON
+    input.style.backgroundColor = "#1E1B4B";
     input.style.color = "white";
-    input.style.border = "2px solid #ccc";
-    input.style.borderRadius = "8px";
-    input.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.1)";
+    input.style.border = "2px solid #8B5CF6";
+    input.style.borderRadius = "10px";
+
+    input.style.boxShadow = `
+      0 0 5px #8B5CF6,
+      0 0 15px #7C3AED,
+      0 0 25px rgba(124, 58, 237, 0.6)
+    `;
+
     return input;
 }
-
 export function createValidationButton() {
     const button = document.createElement("button");
     button.textContent = "Valider";
