@@ -20,12 +20,13 @@
 html,
 body {
   margin: 0;
-  min-height: 100%;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   position: relative;
-  overflow-x: hidden;
   color: var(--text-main);
   font-family: "Honk", system-ui;
   font-optical-sizing: auto;
@@ -34,6 +35,8 @@ body {
   background: radial-gradient(circle at 15% 10%, #294ed2 0%, transparent 40%),
     radial-gradient(circle at 85% 20%, #4f1eca 0%, transparent 35%),
     linear-gradient(160deg, var(--bg-deep), var(--bg-mid) 48%, var(--bg-neon));
+  height: 100vh;
+  width: 100vw;
 }
 
 #galaxyCanvas {
@@ -160,6 +163,7 @@ body {
   animation: twinkle-static-c 7.9s ease-in-out infinite;
   animation-delay: -3.7s;
 }
+
 .home-screen,
 .play-area {
   width: min(900px, calc(100% - 48px));
@@ -191,7 +195,6 @@ body {
     0 0 34px rgba(158, 99, 255, 1);
   position: relative;
 }
-
 
 .game-logo::after {
   content: "";
@@ -227,7 +230,6 @@ body {
     0 0 26px rgba(46, 232, 255, 0.2);
   backdrop-filter: blur(4px);
   animation: rise-in 1.15s ease both;
-
 }
 
 .mission-title {
@@ -346,8 +348,6 @@ button:active {
   filter: drop-shadow(0 0 12px rgba(46, 232, 255, 0.4));
 }
 
-/* Position and transform are managed in main.js (decorativeLayout). */
-
 .side-canard {
   background-image: url("./assets/images/Fond_canard.png");
 }
@@ -452,43 +452,58 @@ button:active {
   clip-path: polygon(66% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 66% 66%);
 }
 
+/* ===== PLAY AREA - OPTIMISÉ POUR ZÉRO SCROLL ===== */
 .play-area {
-  padding-top: 42px;
-  padding-bottom: 48px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .level-title {
-  margin: 0 0 14px;
-  font-size: clamp(1.8rem, 6vw, 3rem);
+  margin: 4px 0;
+  padding: 0;
+  font-size: clamp(1.2rem, 4vw, 2rem);
   color: #dce8ff;
   text-shadow: 0 0 8px rgba(46, 232, 255, 0.5);
+  flex-shrink: 0;
 }
 
+/* ===== GAME CONTAINER - ZÉRO SCROLL ===== */
 #gameContainer {
-  margin-top: 14px;
-  padding: 20px;
-  border: 1px solid rgba(158, 99, 255, 0.5);
-  border-radius: 15px;
-  background: var(--panel);
-  box-shadow: 0 0 20px rgba(158, 99, 255, 0.4), inset 0 0 22px rgba(17, 17, 39, 0.6);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  overflow: hidden;
+  margin: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 0;
 }
 
 .nav-controls {
-  margin-top: 18px;
+  margin: 4px 0;
+  padding: 0;
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .nav-controls button {
-  padding: 10px 14px;
-  font-size: 0.88rem;
+  padding: 6px 10px;
+  font-size: 0.75rem;
 }
 
 canvas {
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
 
 .colorBox {
@@ -526,7 +541,6 @@ body.in-game .start-btn {
   filter: blur(0.6px);
 }
 
-/* icones flottantes */
 .floating-icons {
   position: fixed;
   inset: 0;
@@ -545,8 +559,6 @@ body.in-game .start-btn {
   filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
 }
 
-
-
 .neon-controller { background-image: url('./assets/neon/controller.png'); top: 12%; left: 18%; }
 .neon-duck       { background-image: url('./assets/neon/duck.png');       top: 42%; left: 8%; }
 .neon-pizza      { background-image: url('./assets/neon/pizza.png');      top: 25%; left: 22%; }
@@ -558,14 +570,9 @@ body.in-game .start-btn {
   50% { transform: translateY(-12px); }
 }
 
-
 @keyframes starlight {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-420px);
-  }
+  from { transform: translateY(0); }
+  to { transform: translateY(-420px); }
 }
 
 @keyframes meteor {
@@ -573,12 +580,8 @@ body.in-game .start-btn {
     transform: translate3d(0, 0, 0) rotate(-26deg);
     opacity: 0;
   }
-  10% {
-    opacity: 1;
-  }
-  60% {
-    opacity: 1;
-  }
+  10% { opacity: 1; }
+  60% { opacity: 1; }
   100% {
     transform: translate3d(120vw, 42vh, 0) rotate(-26deg);
     opacity: 0;
@@ -586,66 +589,31 @@ body.in-game .start-btn {
 }
 
 @keyframes twinkle-static-a {
-  0%,
-  100% {
-    opacity: 0.36;
-  }
-  16% {
-    opacity: 0.62;
-  }
-  39% {
-    opacity: 0.44;
-  }
-  67% {
-    opacity: 0.74;
-  }
-  86% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 0.36; }
+  16% { opacity: 0.62; }
+  39% { opacity: 0.44; }
+  67% { opacity: 0.74; }
+  86% { opacity: 0.5; }
 }
 
 @keyframes twinkle-static-b {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  23% {
-    opacity: 0.58;
-  }
-  51% {
-    opacity: 0.4;
-  }
-  79% {
-    opacity: 0.66;
-  }
-  92% {
-    opacity: 0.46;
-  }
+  0%, 100% { opacity: 0.3; }
+  23% { opacity: 0.58; }
+  51% { opacity: 0.4; }
+  79% { opacity: 0.66; }
+  92% { opacity: 0.46; }
 }
 
 @keyframes twinkle-static-c {
-  0%,
-  100% {
-    opacity: 0.28;
-  }
-  12% {
-    opacity: 0.5;
-  }
-  36% {
-    opacity: 0.34;
-  }
-  61% {
-    opacity: 0.6;
-  }
-  84% {
-    opacity: 0.42;
-  }
+  0%, 100% { opacity: 0.28; }
+  12% { opacity: 0.5; }
+  36% { opacity: 0.34; }
+  61% { opacity: 0.6; }
+  84% { opacity: 0.42; }
 }
 
 @keyframes shine {
-  to {
-    transform: translateX(130%);
-  }
+  to { transform: translateX(130%); }
 }
 
 @keyframes rise-in {
@@ -660,28 +628,15 @@ body.in-game .start-btn {
 }
 
 @keyframes float-piece {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes logo-glitch {
-  0% {
-    transform: translateX(0);
-  }
-  30% {
-    transform: translateX(-2px);
-  }
-  60% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
 }
 
 @media (max-width: 900px) {
@@ -702,10 +657,6 @@ body.in-game .start-btn {
   .home-screen,
   .play-area {
     width: calc(100% - 24px);
-  }
-
-  #gameContainer {
-    padding: 14px;
   }
 
   .mission-text {
