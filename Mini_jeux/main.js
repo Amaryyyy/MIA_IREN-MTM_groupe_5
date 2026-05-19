@@ -1,6 +1,31 @@
 import { getAllLevels } from "./level.js";
 import { gameManager } from "./gameCleanup.js";
 
+console.log('main.js loaded');
+
+// Global error handlers to display errors on the page for debugging
+window.addEventListener('error', (ev) => {
+  try {
+    const overlay = document.getElementById('debugOverlay');
+    if (overlay) {
+      overlay.style.display = 'block';
+      overlay.textContent = `Error: ${ev.message} at ${ev.filename}:${ev.lineno}:${ev.colno}\n` + (ev.error && ev.error.stack ? ev.error.stack : '');
+    }
+  } catch (e) {}
+  console.error(ev.error || ev.message, ev);
+});
+
+window.addEventListener('unhandledrejection', (ev) => {
+  try {
+    const overlay = document.getElementById('debugOverlay');
+    if (overlay) {
+      overlay.style.display = 'block';
+      overlay.textContent = `UnhandledRejection: ${ev.reason}`;
+    }
+  } catch (e) {}
+  console.error('UnhandledRejection', ev);
+});
+
 const levels = getAllLevels();
 let currentLevel = 0;
 
@@ -189,6 +214,7 @@ async function loadLevel() {
     // Démarrer le système de tracking des timers
     gameManager.startGame();
 
+    console.log('Importing', getGameFilePath(currentLevelData.game));
     const module = await import(getGameFilePath(currentLevelData.game));
     const startGameFunction = resolveStarter(module, currentLevelData.game);
 
@@ -215,6 +241,7 @@ function startGameFlow() {
   homeScreen.classList.add("hidden");
   playArea.classList.remove("hidden");
   document.body.classList.add("in-game");
+  console.log('startGameFlow called, loading level', currentLevel);
   loadLevel();
 }
 

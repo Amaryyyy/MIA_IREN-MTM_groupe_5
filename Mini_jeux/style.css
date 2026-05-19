@@ -795,3 +795,8 @@ body.in-game .side-image {
     font-size: 1.3rem;
   }
 }
+
+/* Debug overlay styles */
+#debugOverlay {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+}
