@@ -1,5 +1,9 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "root": "mon-jeu"
+  "builds": [
+    { "src": "Mini_jeux/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "^/$", "dest": "/Mini_jeux/index.html" },
+    { "src": "/(.*)", "dest": "/Mini_jeux/$1" }
+  ]
 }
