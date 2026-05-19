@@ -30,8 +30,8 @@ export function startGame40(container, onFinish) {
     mixCube();
     renderCube();
 
-    canvas.addEventListener("mousedown", startDrag);
-    canvas.addEventListener("mouseup", endDrag);
+    gameManager.addEventListener(canvas, "mousedown", startDrag);
+    gameManager.addEventListener(canvas, "mouseup", endDrag);
 }
 
 /* ---------- INIT ---------- */
@@ -154,7 +154,7 @@ function checkCubeWin() {
     }
 
     document.getElementById("msg17").textContent = "🎉 Bravo ! Toutes les lignes sont monochromes !";
-    setTimeout(game100.onFinish, 1500);
+    gameManager.addTimeout(setTimeout(game100.onFinish, 1500));
 }
 
 /* ---------- RENDER ---------- */

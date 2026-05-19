@@ -1,13 +1,12 @@
 import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
-import { gameManager } from "../gameCleanup.js";
 
 export function startGame31(container, onFinish) {
   const levels = [
 
   {
     question: "10, 9, 8, 7, ?",
-    answer: "5",
-    hint: "La vraie logique ici n'est pas la suite décroit : c'est l'indice (1→10, 2→9 ...)."
+    answer: "6",
+    hint: "La logique la plus directe ici est la décroissance de 1 en 1."
   }
   ];
   container.innerHTML = "";

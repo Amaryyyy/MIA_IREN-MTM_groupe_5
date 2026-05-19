@@ -33,9 +33,9 @@ export function startGame38(container, onFinish) {
         status: "PLAYING"
     };
 
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mousemove", drawPreview);
-    canvas.addEventListener("mouseup", endDraw);
+    gameManager.addEventListener(canvas, "mousedown", startDraw);
+    gameManager.addEventListener(canvas, "mousemove", drawPreview);
+    gameManager.addEventListener(canvas, "mouseup", endDraw);
 
     drawPizza();
 }
@@ -124,7 +124,7 @@ function checkPizzaWin() {
                     "❌ Deux parts sont trop similaires ! Réessayez…";
 
                 pizzaGame.status = "LOSE";
-                setTimeout(() => startGame98(pizzaGame.container, pizzaGame.onFinish), 1500);
+                gameManager.addTimeout(setTimeout(() => startGame38(pizzaGame.container, pizzaGame.onFinish), 1500));
                 return;
             }
         }
@@ -134,7 +134,7 @@ function checkPizzaWin() {
         "🔥 Bravo ! Ta diavola est coupée en parts bien différentes !";
 
     pizzaGame.status = "WIN";
-    setTimeout(pizzaGame.onFinish, 1500);
+    gameManager.addTimeout(setTimeout(pizzaGame.onFinish, 1500));
 }
 
 /* ------------------ DRAW PIZZA (diavola réaliste) ------------------ */

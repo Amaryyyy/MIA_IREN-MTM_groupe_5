@@ -6,7 +6,7 @@ let game24 = {};
 
 
 
-export function startGame99(container, onFinish) {
+export function startGame39(container, onFinish) {
    container.innerHTML = `
        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#2b1b10; padding:20px; border-radius:15px;">
            <h2 style="margin:0 0 8px;">🍦 Ice Stack Deluxe v2 — Glaces réalistes</h2>
@@ -108,15 +108,16 @@ export function startGame99(container, onFinish) {
 
 
 
-   canvas.addEventListener("mousedown", onMouseDown24);
-   canvas.addEventListener("mousemove", onMouseMove24);
-   canvas.addEventListener("mouseup", onMouseUp24);
-   canvas.addEventListener("mouseleave", onMouseUp24);
+    gameManager.addEventListener(canvas, "mousedown", onMouseDown24);
+    gameManager.addEventListener(canvas, "mousemove", onMouseMove24);
+    gameManager.addEventListener(canvas, "mouseup", onMouseUp24);
+    gameManager.addEventListener(canvas, "mouseleave", onMouseUp24);
 
 
 
 
-   requestAnimationFrame(loop24);
+    const frame = requestAnimationFrame(loop24);
+    gameManager.addAnimationFrame(frame);
 }
 
 
@@ -261,7 +262,7 @@ function checkWin24() {
    if (correct) {
        setMsg24("🎉 Bravo ! Tu as trouvé l'ordre secret : l'ordre alphabétique (de bas en haut) !");
        game24.gameOver = true;
-       setTimeout(() => game24.onFinish && game24.onFinish(), 1500);
+       gameManager.addTimeout(setTimeout(() => game24.onFinish && game24.onFinish(), 1500));
    } else {
        setMsg24("❌ Mauvais ordre… Les boules fondent !");
        triggerMelting24();
@@ -293,7 +294,8 @@ function triggerMelting24() {
 function loop24() {
    updateMelting24();
    render24();
-   requestAnimationFrame(loop24);
+    const frame = requestAnimationFrame(loop24);
+    gameManager.addAnimationFrame(frame);
 }
 
 

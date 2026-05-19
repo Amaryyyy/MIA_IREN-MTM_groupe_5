@@ -1,7 +1,6 @@
 import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
-import { gameManager } from "../gameCleanup.js";
 
-export function startGame10(container, onFinish) {
+export function startGame34(container, onFinish) {
   const levels = [
   {
     question: "Dernier niveau : il n'y a pas de logique !"

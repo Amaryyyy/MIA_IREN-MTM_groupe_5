@@ -1,4 +1,3 @@
-import { createInputField, createValidationButton, createFeedbackDiv, setFeedback } from "../gameInterface.js";
 import { gameManager } from "../gameCleanup.js";
 
 export function startGame37(container, onFinish) {
@@ -182,10 +181,11 @@ export function startGame37(container, onFinish) {
     if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
       running = false;
       status.textContent = "Collision murale ❌";
-      setTimeout(() => {
+      gameManager.addTimeout(setTimeout(() => {
         reset();
-        requestAnimationFrame(loop);
-      }, 900);
+        const frame = requestAnimationFrame(loop);
+        gameManager.addAnimationFrame(frame);
+      }, 900));
       return;
     }
 
@@ -193,10 +193,11 @@ export function startGame37(container, onFinish) {
     if (obstacles.some(o => o.x === head.x && o.y === head.y)) {
       running = false;
       status.textContent = "Obstacle touché ❌";
-      setTimeout(() => {
+      gameManager.addTimeout(setTimeout(() => {
         reset();
-        requestAnimationFrame(loop);
-      }, 900);
+        const frame = requestAnimationFrame(loop);
+        gameManager.addAnimationFrame(frame);
+      }, 900));
       return;
     }
 
@@ -204,10 +205,11 @@ export function startGame37(container, onFinish) {
     if (snake.some(s => s.x === head.x && s.y === head.y)) {
       running = false;
       status.textContent = "Auto-collision ❌";
-      setTimeout(() => {
+      gameManager.addTimeout(setTimeout(() => {
         reset();
-        requestAnimationFrame(loop);
-      }, 900);
+        const frame = requestAnimationFrame(loop);
+        gameManager.addAnimationFrame(frame);
+      }, 900));
       return;
     }
 
@@ -225,7 +227,9 @@ export function startGame37(container, onFinish) {
         snake.pop();
       } else if (it.type === "speed") {
         speed = 80;
-        setTimeout(() => speed = 130, 4000);
+        gameManager.addTimeout(setTimeout(() => {
+          speed = 130;
+        }, 4000));
       }
 
       items.splice(itemIndex, 1);
@@ -239,7 +243,7 @@ export function startGame37(container, onFinish) {
     if (snake.length >= TARGET_SIZE) {
       status.textContent = "Objectif atteint 🎉";
       running = false;
-      setTimeout(onFinish, 800);
+      gameManager.addTimeout(setTimeout(onFinish, 800));
     }
   }
 
@@ -251,11 +255,12 @@ export function startGame37(container, onFinish) {
       step();
     }
     draw();
-    requestAnimationFrame(loop);
+    const frame = requestAnimationFrame(loop);
+    gameManager.addAnimationFrame(frame);
   }
 
   // --- INPUT ---
-  window.onkeydown = e => {
+  const onKeyDown = (e) => {
     const k = e.key.toLowerCase();
 
     if ((k === "arrowup" || k === "z") && direction.y !== 1)
@@ -271,6 +276,9 @@ export function startGame37(container, onFinish) {
       nextDirection = { x: 1, y: 0 };
   };
 
+  gameManager.addEventListener(window, "keydown", onKeyDown);
+
   reset();
-  requestAnimationFrame(loop);
+  const frame = requestAnimationFrame(loop);
+  gameManager.addAnimationFrame(frame);
 }

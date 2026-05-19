@@ -157,8 +157,14 @@ export function startGame35(container, onFinish) {
   };
 
   const keys = {};
-  document.addEventListener("keydown", e => keys[e.key] = true);
-  document.addEventListener("keyup", e => keys[e.key] = false);
+  const onKeyDown = (e) => {
+    keys[e.key] = true;
+  };
+  const onKeyUp = (e) => {
+    keys[e.key] = false;
+  };
+  gameManager.addEventListener(document, "keydown", onKeyDown);
+  gameManager.addEventListener(document, "keyup", onKeyUp);
 
   function canMoveTo(nx, ny) {
     if (
@@ -252,7 +258,8 @@ export function startGame35(container, onFinish) {
     if (!running) return;
     update();
     draw();
-    requestAnimationFrame(loop);
+    const frame = requestAnimationFrame(loop);
+    gameManager.addAnimationFrame(frame);
   }
 
   function endGame(msg) {
