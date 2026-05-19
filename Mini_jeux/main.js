@@ -137,7 +137,8 @@ function applyDecorativeImageLayout() {
     item.element.style.right = "auto";
     item.element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
     item.element.style.transformOrigin = "50% 50%";
-    item.element.style.zIndex = String(10 + index);
+    // Keep decorative images behind the main UI so they don't block buttons.
+    item.element.style.zIndex = String(2);
   });
 }
 
