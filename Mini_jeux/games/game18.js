@@ -2,16 +2,41 @@ import { gameManager } from "../gameCleanup.js";
 
 let game16 = {};
 
+const EVEN_COLORS = new Set(["A", "B"]);
+const ODD_COLORS  = new Set(["C", "D"]);
+
 export function startGame18(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: #0d0d0d; padding: 20px; border-radius: 15px;">
-            <div style="font-size: 1.2em; margin-bottom: 10px; font-family: 'VT323', monospace;">
+        <div style="
+            text-align:center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            width: 100vw;
+            min-height: 100vh;
+            padding: 18px 16px 14px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        ">
+            <div style="font-size: 1.2em; margin-bottom: 10px; font-family: 'VT323', monospace; color: #cfe8ff; text-shadow: 0 0 8px rgba(0,229,255,0.15);">
                 🔄 Mouvements : <span id="moves16" style="color: #00e5ff;">0</span>
             </div>
-            <canvas id="flipCanvas" width="400" height="400" 
-                style="border: 4px solid #ff3860; border-radius: 8px; box-shadow: 0 0 25px #ff3860aa; cursor: pointer;">
+            <canvas id="flipCanvas" width="400" height="400"
+                style="
+                    border: 1px solid rgba(255,255,255,0.08);
+                    border-radius: 14px;
+                    box-shadow: 0 14px 30px rgba(0,0,0,0.10);
+                    cursor: pointer;
+                    display: block;
+                    width: min(60vmin, 66vw, 66vh);
+                    height: min(60vmin, 66vw, 66vh);
+                    background: rgba(255,255,255,0.02);
+                ">
             </canvas>
-            <p id="msg16" style="margin-top: 15px; font-weight: bold; min-height: 24px; font-family: 'VT323', monospace;">
+            <p id="msg16" style="margin-top: 15px; font-weight: bold; min-height: 24px; font-family: 'VT323', monospace; color: #d8f3ff; text-shadow: 0 0 8px rgba(0,229,255,0.12);">
                 Retournez les cases pour former un damier !
             </p>
         </div>
@@ -28,6 +53,7 @@ export function startGame18(container, onFinish) {
         moves: 0,
         onFinish,
         status: "PLAYING",
+        displaySize: 400,
 
         // 🎨 Couleurs rétro-gaming
         colors: {
@@ -39,6 +65,8 @@ export function startGame18(container, onFinish) {
     };
 
     initFlipPuzzle();
+    resizeFlipPuzzle();
+    gameManager.addEventListener(window, "resize", resizeFlipPuzzle);
     canvas.addEventListener("click", clickFlipPuzzle);
     renderFlipPuzzle();
 }
@@ -75,6 +103,8 @@ function clickFlipPuzzle(e) {
     const y = Math.floor(my / game16.tileSize);
     const idx = y * 5 + x;
 
+    if (x < 0 || y < 0 || x >= game16.size || y >= game16.size) return;
+
     // Retourner la case
     game16.grid[idx].face = 1 - game16.grid[idx].face;
 
@@ -88,19 +118,25 @@ function clickFlipPuzzle(e) {
 /* ------------------ CHECK WIN ------------------ */
 
 function checkFlipWin() {
+    let evenColor = null;
+    let oddColor = null;
+
     for (let y = 0; y < 5; y++) {
         for (let x = 0; x < 5; x++) {
             const idx = y * 5 + x;
             const cell = game16.grid[idx];
 
-            const shouldBeA = ((x + y) % 2 === 0);
+            const colorKey = getCellKey(cell);
+            const isEven = ((x + y) % 2 === 0);
 
-            if (shouldBeA) {
-                // Case doit être A → type AB + face recto
-                if (cell.type !== "AB" || cell.face !== 0) return;
+            if (isEven) {
+                if (!EVEN_COLORS.has(colorKey)) return;
+                if (evenColor === null) evenColor = colorKey;
+                if (colorKey !== evenColor) return;
             } else {
-                // Case doit être C → type CD + face recto
-                if (cell.type !== "CD" || cell.face !== 0) return;
+                if (!ODD_COLORS.has(colorKey)) return;
+                if (oddColor === null) oddColor = colorKey;
+                if (colorKey !== oddColor) return;
             }
         }
     }
@@ -121,12 +157,39 @@ function getCellColor(cell) {
     }
 }
 
+function resizeFlipPuzzle() {
+    const canvas = game16.canvas;
+    const ctx = game16.ctx;
+    const maxSide = Math.min(window.innerWidth * 0.60, window.innerHeight * 0.60);
+    const displaySize = Math.max(220, Math.floor(maxSide));
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.style.width = displaySize + "px";
+    canvas.style.height = displaySize + "px";
+    canvas.width = Math.floor(displaySize * dpr);
+    canvas.height = Math.floor(displaySize * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    game16.displaySize = displaySize;
+    game16.tileSize = displaySize / game16.size;
+}
+
+function getCellKey(cell) {
+    if (cell.type === "AB") {
+        return cell.face === 0 ? "A" : "B";
+    }
+    return cell.face === 0 ? "C" : "D";
+}
+
 /* ------------------ RENDER ------------------ */
 
 function renderFlipPuzzle() {
     const ctx = game16.ctx;
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, 400, 400);
+    ctx.clearRect(0, 0, game16.displaySize, game16.displaySize);
+
+    const tile = game16.tileSize;
+    const pad = Math.max(4, tile * 0.06);
+    const inner = tile - pad * 2;
 
     for (let i = 0; i < 25; i++) {
         const cell = game16.grid[i];
@@ -136,17 +199,18 @@ function renderFlipPuzzle() {
         const y = Math.floor(i / 5) * game16.tileSize;
 
         // Effet glossy rétro
-        const gradient = ctx.createLinearGradient(x, y, x + 80, y + 80);
+        const gradient = ctx.createLinearGradient(x, y, x + tile, y + tile);
         gradient.addColorStop(0, lighten(color, 0.25));
         gradient.addColorStop(1, color);
 
         ctx.fillStyle = gradient;
-        ctx.fillRect(x + 5, y + 5, 70, 70);
+        roundRect(ctx, x + pad, y + pad, inner, inner, Math.max(8, tile * 0.12));
+        ctx.fill();
 
         // Glow néon
         ctx.strokeStyle = color + "aa";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x + 5, y + 5, 70, 70);
+        ctx.lineWidth = Math.max(2, tile * 0.04);
+        ctx.stroke();
     }
 }
 
@@ -163,4 +227,18 @@ function lighten(hex, amount) {
     b = Math.min(255, b);
 
     return `rgb(${r},${g},${b})`;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
 }

@@ -286,6 +286,15 @@ startBtn.addEventListener("click", startGameFlow);
 nextBtn.addEventListener("click", nextLevel);
 prevBtn.addEventListener("click", previousLevel);
 
+window.addEventListener("keydown", (event) => {
+ if (event.code !== "Space" || homeScreen.classList.contains("hidden")) {
+   return;
+ }
+
+ event.preventDefault();
+ startGameFlow();
+}, { passive: false });
+
 
 applyDecorativeImageLayout();
 setupDecorativeImageClicks();

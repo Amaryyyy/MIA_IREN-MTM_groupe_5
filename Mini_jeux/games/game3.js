@@ -163,16 +163,16 @@ export function startGame3(container, onFinish) {
   const level = {
 
     map: [
-      [0,0,1,0,0,0,1,0,0,0],
-      [1,0,1,0,1,0,1,0,1,0],
-      [1,0,0,0,1,0,0,0,0,0],
-      [1,1,1,0,1,1,1,1,0,1],
-      [1,0,0,0,0,0,0,1,0,1],
-      [1,0,1,1,1,1,0,1,0,1],
-      [1,0,0,0,0,1,0,0,0,1],
-      [1,1,1,1,0,0,0,1,0,1],
-      [1,0,0,0,0,1,0,0,0,0],
-      [1,1,1,1,1,1,1,1,0,2]
+      [0,0,0,0,1,1,1,1,1,1],
+      [1,1,1,0,1,0,0,0,0,0],
+      [1,0,0,0,1,0,1,1,1,0],
+      [1,0,1,1,1,0,1,0,0,0],
+      [1,0,0,0,0,0,1,0,1,1],
+      [1,1,1,1,1,0,1,0,0,0],
+      [1,0,0,0,1,0,1,1,1,0],
+      [1,0,1,0,1,0,0,0,1,0],
+      [1,0,1,0,0,0,1,0,0,0],
+      [1,1,1,1,1,1,1,1,1,2]
     ],
 
     playerStart: {
@@ -180,6 +180,16 @@ export function startGame3(container, onFinish) {
       y: 0
     }
   };
+
+  const hintCells = new Set([
+    "0,1",
+    "1,7",
+    "4,4",
+    "7,9",
+    "8,3"
+  ]);
+
+  let wallsRevealUntil = 0;
 
   // =========================
   // RANDOM KEYS
@@ -234,15 +244,61 @@ export function startGame3(container, onFinish) {
 
   const keys = {};
 
+  function isLetterKey(key) {
+    return /^[a-z]$/.test(key);
+  }
+
+  function getControlFromKey(key) {
+    if (key === controls.up) {
+      return { dx: 0, dy: -1 };
+    }
+
+    if (key === controls.down) {
+      return { dx: 0, dy: 1 };
+    }
+
+    if (key === controls.left) {
+      return { dx: -1, dy: 0 };
+    }
+
+    if (key === controls.right) {
+      return { dx: 1, dy: 0 };
+    }
+
+    return null;
+  }
+
   // =========================
   // KEYBOARD
   // =========================
   const keyDownHandler = (e) => {
-    keys[e.key.toLowerCase()] = true;
+    const key = e.key.toLowerCase();
+
+    if (!isLetterKey(key)) {
+      return;
+    }
+
+    keys[key] = true;
+
+    if (e.repeat) {
+      return;
+    }
+
+    const control = getControlFromKey(key);
+
+    if (control) {
+      move(control.dx, control.dy);
+    }
   };
 
   const keyUpHandler = (e) => {
-    keys[e.key.toLowerCase()] = false;
+    const key = e.key.toLowerCase();
+
+    if (!isLetterKey(key)) {
+      return;
+    }
+
+    keys[key] = false;
   };
 
   gameManager.addEventListener(
@@ -285,6 +341,10 @@ export function startGame3(container, onFinish) {
       player.x = newX;
       player.y = newY;
 
+      if (hintCells.has(`${newX},${newY}`)) {
+        wallsRevealUntil = Date.now() + 500;
+      }
+
       // WIN
       if (
         level.map[newY][newX] === 2
@@ -310,28 +370,16 @@ export function startGame3(container, onFinish) {
   // UPDATE
   // =========================
   function update() {
-
-    if (keys[controls.up]) {
-      move(0, -1);
-    }
-
-    if (keys[controls.down]) {
-      move(0, 1);
-    }
-
-    if (keys[controls.left]) {
-      move(-1, 0);
-    }
-
-    if (keys[controls.right]) {
-      move(1, 0);
-    }
+    return;
   }
 
   // =========================
   // DRAW
   // =========================
   function draw() {
+
+    const shouldRevealWalls =
+      Date.now() < wallsRevealUntil;
 
     ctx.clearRect(
       0,
@@ -356,7 +404,7 @@ export function startGame3(container, onFinish) {
     ctx.fillRect(
       Math.round(
         innerPadding +
-        level.playerStart.x * tileSize+40
+        level.playerStart.x * tileSize
       ),
 
       Math.round(
@@ -380,6 +428,56 @@ export function startGame3(container, onFinish) {
         x < level.map[y].length;
         x++
       ) {
+
+        if (
+          level.map[y][x] === 1 &&
+          shouldRevealWalls
+        ) {
+
+          ctx.save();
+
+          ctx.shadowColor = "#ffffff";
+
+          ctx.shadowBlur = 18;
+
+          ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+
+          ctx.fillRect(
+            Math.round(
+              innerPadding +
+              x * tileSize
+            ),
+
+            Math.round(
+              innerPadding +
+              y * tileSize
+            ),
+
+            tileSize,
+            tileSize
+          );
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+
+          ctx.lineWidth = 2;
+
+          ctx.strokeRect(
+            Math.round(
+              innerPadding +
+              x * tileSize
+            ),
+
+            Math.round(
+              innerPadding +
+              y * tileSize
+            ),
+
+            tileSize,
+            tileSize
+          );
+
+          ctx.restore();
+        }
 
         if (
           level.map[y][x] === 2
@@ -448,7 +546,7 @@ export function startGame3(container, onFinish) {
     ctx.arc(
       Math.round(
         innerPadding +
-        player.x * tileSize +40+
+        player.x * tileSize +
         tileSize / 2
       ),
 
