@@ -162,17 +162,18 @@ export function startGame3(container, onFinish) {
   // =========================
   const level = {
 
+    // More complex 10x10 maze (winding passages)
     map: [
-      [0,0,0,0,1,1,1,1,1,1],
-      [1,1,1,0,1,0,0,0,0,0],
-      [1,0,0,0,1,0,1,1,1,0],
-      [1,0,1,1,1,0,1,0,0,0],
-      [1,0,0,0,0,0,1,0,1,1],
-      [1,1,1,1,1,0,1,0,0,0],
-      [1,0,0,0,1,0,1,1,1,0],
-      [1,0,1,0,1,0,0,0,1,0],
-      [1,0,1,0,0,0,1,0,0,0],
-      [1,1,1,1,1,1,1,1,1,2]
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,1,0,0,0,0,1],
+      [1,0,1,0,1,0,1,1,0,1],
+      [1,0,1,0,0,0,0,1,0,1],
+      [1,0,1,1,1,1,0,1,0,1],
+      [1,0,0,0,0,1,0,0,0,1],
+      [1,1,1,1,0,1,1,1,0,1],
+      [1,0,0,1,0,0,0,1,0,1],
+      [1,0,0,0,0,1,0,0,2,1],
+      [1,1,1,1,1,1,1,1,1,1]
     ],
 
     playerStart: {
@@ -342,7 +343,8 @@ export function startGame3(container, onFinish) {
       player.y = newY;
 
       if (hintCells.has(`${newX},${newY}`)) {
-        wallsRevealUntil = Date.now() + 500;
+        // reveal walls for 5 seconds when stepping on a hint cell
+        wallsRevealUntil = Date.now() + 5000;
       }
 
       // WIN

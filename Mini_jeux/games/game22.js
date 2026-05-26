@@ -2,18 +2,10 @@ import { gameManager } from "../gameCleanup.js";let game20 = {};
 
 export function startGame22(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#050509; padding:20px; border-radius:15px;">
-            <h2 style="margin:0 0 8px;">🧱 Tetris inversé — Remplis l'écran</h2>
-            <p style="margin:0 0 8px; font-size:0.95em;">
-                Déplace les pièces avec ⬅️ ➡️, tourne avec ⬆️, fais tomber avec ⬇️ ou ESPACE.<br>
-                But : <span style="color:#afff9f;">remplir entièrement la grille</span>. Aucune ligne ne disparaît.
-            </p>
+        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:20px; border-radius:15px;">
             <canvas id="tetrisCanvas20" width="200" height="400"
-                style="border:4px solid #ff3860; border-radius:8px; box-shadow:0 0 25px #ff3860aa; background:#050509;">
+                style="border:4px solid #6f7cff; border-radius:8px; box-shadow:0 0 25px rgba(111,124,255,0.28); background:#050509;">
             </canvas>
-            <p id="msg20" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-                Remplis la grille sans laisser de trous !
-            </p>
         </div>
     `;
 
@@ -182,6 +174,11 @@ function lockPiece20() {
     }
 
     // ici, on NE supprime PAS les lignes : le but est de remplir
+    if (hasIrrecoverableHole20()) {
+        resetGame20();
+        return;
+    }
+
     if (isGridFull20()) {
         endGame20(true);
         return;
@@ -199,6 +196,59 @@ function isGridFull20() {
         }
     }
     return true;
+}
+
+function hasIrrecoverableHole20() {
+    const reachable = Array.from({ length: game20.rows }, () => new Array(game20.cols).fill(false));
+    const stack = [];
+
+    for (let c = 0; c < game20.cols; c++) {
+        if (!game20.grid[0][c]) {
+            reachable[0][c] = true;
+            stack.push([0, c]);
+        }
+    }
+
+    while (stack.length > 0) {
+        const [r, c] = stack.pop();
+        const neighbors = [
+            [r - 1, c],
+            [r + 1, c],
+            [r, c - 1],
+            [r, c + 1]
+        ];
+
+        for (const [nr, nc] of neighbors) {
+            if (nr < 0 || nr >= game20.rows || nc < 0 || nc >= game20.cols) continue;
+            if (reachable[nr][nc]) continue;
+            if (game20.grid[nr][nc]) continue;
+            reachable[nr][nc] = true;
+            stack.push([nr, nc]);
+        }
+    }
+
+    for (let r = 0; r < game20.rows; r++) {
+        for (let c = 0; c < game20.cols; c++) {
+            if (!game20.grid[r][c] && !reachable[r][c]) return true;
+        }
+    }
+
+    return false;
+}
+
+function resetGame20() {
+    for (let r = 0; r < game20.rows; r++) {
+        game20.grid[r].fill(0);
+    }
+
+    game20.current = null;
+    game20.currentX = 0;
+    game20.currentY = 0;
+    game20.currentShapeIndex = 0;
+    game20.gameOver = false;
+    game20.lastDrop = 0;
+
+    spawnPiece20();
 }
 
 /* ---------- LOOP ---------- */
@@ -226,8 +276,7 @@ function loop20(timestamp) {
 function render20() {
     const ctx = game20.ctx;
     const { width, height } = game20.canvas;
-    ctx.fillStyle = "#050509";
-    ctx.fillRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
 
     // grille
     ctx.strokeStyle = "#111320";
@@ -322,11 +371,5 @@ function rotateMatrix20(mat) {
 
 function endGame20(win) {
     game20.gameOver = true;
-    const msgEl = document.getElementById("msg20");
-    if (win) {
-        msgEl.textContent = "🎉 Écran entièrement rempli ! Mission accomplie.";
-        setTimeout(() => game20.onFinish && game20.onFinish(), 1500);
-    } else {
-        msgEl.textContent = "❌ Plus de place pour une nouvelle pièce. Tu n'as pas réussi à tout remplir.";
-    }
+    setTimeout(() => game20.onFinish && game20.onFinish(), 1500);
 }

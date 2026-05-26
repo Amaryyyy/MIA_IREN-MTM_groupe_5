@@ -223,33 +223,45 @@ async function loadLevel() {
  container.innerHTML = "";
 
 
- try {
-   // Démarrer le système de tracking des timers
-   gameManager.startGame();
+  try {
+    // Démarrer le système de tracking des timers
+    gameManager.startGame();
 
+    const path = getGameFilePath(currentLevelData.game);
 
-   const module = await import(getGameFilePath(currentLevelData.game));
-   const startGameFunction = resolveStarter(module, currentLevelData.game);
+    // Vérifier rapidement que le fichier existe (HEAD) pour fournir un message utile
+    let exists = true;
+    try {
+      const resp = await fetch(path, { method: "HEAD" });
+      if (!resp.ok) exists = false;
+    } catch (e) {
+      exists = false;
+    }
+    if (!exists) {
+      throw new Error(`Fichier de jeu introuvable: ${path}`);
+    }
 
+    const module = await import(path);
+    const startGameFunction = resolveStarter(module, currentLevelData.game);
 
-   if (!startGameFunction) {
-     throw new Error(`Aucune fonction de demarrage trouvee dans ${currentLevelData.game}.js`);
-   }
+    if (!startGameFunction) {
+      throw new Error(`Aucune fonction de demarrage trouvee dans ${currentLevelData.game}.js`);
+    }
 
+    const onFinishWrapper = () => {
+      gameManager.cleanup();
+      nextLevel();
+    };
 
-   const onFinishWrapper = () => {
-     gameManager.cleanup();
-     nextLevel();
-   };
-
-
-   startGameFunction(container, onFinishWrapper);
-   updateNavButtons();
- } catch (error) {
-   console.error(error);
-   container.innerHTML = `<p>Erreur de chargement pour ${currentLevelData.game}.</p>`;
-   updateNavButtons();
- }
+    startGameFunction(container, onFinishWrapper);
+    updateNavButtons();
+  } catch (error) {
+    console.error(error);
+    const safeMessage = (error && error.message) ? String(error.message).replace(/</g, "&lt;") : "Erreur inconnue";
+    const safeStack = (error && error.stack) ? String(error.stack).replace(/</g, "&lt;") : "";
+    container.innerHTML = `<p>Erreur de chargement pour ${currentLevelData.game}: ${safeMessage}</p><pre style="white-space:pre-wrap;max-height:240px;overflow:auto">${safeStack}</pre>`;
+    updateNavButtons();
+  }
 }
 
 

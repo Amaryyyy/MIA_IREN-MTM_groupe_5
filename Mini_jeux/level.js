@@ -26,6 +26,7 @@ const levels = [
   { game: 'game23', difficulty: 'hard', title: 'Compiler Chaos' },
   { game: 'game24', difficulty: 'hard', title: 'Framework Frenzy' },
   { game: 'game25', difficulty: 'hard', title: 'API Assault' },
+  { game: 'game26', difficulty: 'hard', title: 'Crazy Draft' },
   { game: 'game27', difficulty: 'hard', title: 'Game 27' },
   { game: 'game28', difficulty: 'hard', title: 'Game 28' },
   { game: 'game29', difficulty: 'hard', title: 'Game 29' },
