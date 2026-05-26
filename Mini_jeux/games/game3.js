@@ -42,7 +42,7 @@ export function startGame3(container, onFinish) {
     "0px";
 
   canvasWrapper.style.borderRadius =
-    "22px";
+    "6px";
 
   canvasWrapper.style.display =
     "flex";
@@ -112,7 +112,7 @@ export function startGame3(container, onFinish) {
   canvas.style.border = "none";
 
   canvas.style.borderRadius =
-    "18px";
+    "4px";
 
   canvas.style.background =
     "#050505";
@@ -143,18 +143,21 @@ export function startGame3(container, onFinish) {
   // CONFIG
   // =========================
   const innerPadding =
-    canvas.width * 0.03;
+    0;
 
   const playableWidth =
-    canvas.width - innerPadding ;
+    canvas.width - innerPadding * 2;
 
   const playableHeight =
-    canvas.height - innerPadding *2;
+    canvas.height - innerPadding * 2;
+
+  const mazeColumns = 15;
+  const mazeRows = 12;
 
   const tileSize =
     Math.min(
-      playableWidth / 10,
-      playableHeight / 10
+      playableWidth / mazeColumns,
+      playableHeight / mazeRows
     );
 
   // =========================
@@ -162,18 +165,20 @@ export function startGame3(container, onFinish) {
   // =========================
   const level = {
 
-    // More complex 10x10 maze (winding passages)
+    // Invisible maze with many narrow branches and dead ends.
     map: [
-      [1,1,1,1,1,1,1,1,1,1],
-      [1,0,0,0,1,0,0,0,0,1],
-      [1,0,1,0,1,0,1,1,0,1],
-      [1,0,1,0,0,0,0,1,0,1],
-      [1,0,1,1,1,1,0,1,0,1],
-      [1,0,0,0,0,1,0,0,0,1],
-      [1,1,1,1,0,1,1,1,0,1],
-      [1,0,0,1,0,0,0,1,0,1],
-      [1,0,0,0,0,1,0,0,2,1],
-      [1,1,1,1,1,1,1,1,1,1]
+      [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,0,1,0,0,0,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,1,0,1,0,0,0,1,1,1],
+      [1,0,1,1,1,1,1,0,1,0,1,0,1,1,1],
+      [1,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
+      [1,1,1,1,1,0,1,1,1,0,1,1,1,0,1],
+      [1,0,0,0,1,0,0,0,1,0,0,0,1,0,1],
+      [1,0,1,0,1,1,1,0,1,1,1,0,1,0,1],
+      [1,0,1,0,0,0,1,0,0,0,1,0,0,0,0],
+      [1,0,1,1,1,0,1,1,1,0,1,1,1,1,1],
+      [1,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,0,1,1,1,1,1,1,1,1,1,1,2]
     ],
 
     playerStart: {
@@ -182,13 +187,15 @@ export function startGame3(container, onFinish) {
     }
   };
 
-  const hintCells = new Set([
-    "0,1",
-    "1,7",
-    "4,4",
-    "7,9",
-    "8,3"
+  const revealCells = new Set([
+    "2,0",
+    "5,1",
+    "7,4",
+    "2,6",
+    "14,8"
   ]);
+
+  const WALL_REVEAL_DURATION = 500;
 
   let wallsRevealUntil = 0;
 
@@ -342,9 +349,8 @@ export function startGame3(container, onFinish) {
       player.x = newX;
       player.y = newY;
 
-      if (hintCells.has(`${newX},${newY}`)) {
-        // reveal walls for 5 seconds when stepping on a hint cell
-        wallsRevealUntil = Date.now() + 5000;
+      if (revealCells.has(`${newX},${newY}`)) {
+        wallsRevealUntil = Date.now() + WALL_REVEAL_DURATION;
       }
 
       // WIN
@@ -382,6 +388,11 @@ export function startGame3(container, onFinish) {
 
     const shouldRevealWalls =
       Date.now() < wallsRevealUntil;
+    const tileInset = Math.max(
+      2,
+      Math.round(tileSize * 0.12)
+    );
+    const tileDrawSize = tileSize - tileInset * 2;
 
     ctx.clearRect(
       0,
@@ -406,16 +417,18 @@ export function startGame3(container, onFinish) {
     ctx.fillRect(
       Math.round(
         innerPadding +
-        level.playerStart.x * tileSize
+        level.playerStart.x * tileSize +
+        tileInset
       ),
 
       Math.round(
         innerPadding +
-        level.playerStart.y * tileSize
+        level.playerStart.y * tileSize +
+        tileInset
       ),
 
-      tileSize,
-      tileSize
+      tileDrawSize,
+      tileDrawSize
     );
 
     // GOAL
@@ -491,16 +504,18 @@ export function startGame3(container, onFinish) {
           ctx.fillRect(
             Math.round(
               innerPadding +
-              x * tileSize
+              x * tileSize +
+              tileInset
             ),
 
             Math.round(
               innerPadding +
-              y * tileSize
+              y * tileSize +
+              tileInset
             ),
 
-            tileSize,
-            tileSize
+            tileDrawSize,
+            tileDrawSize
           );
         }
       }
