@@ -89,22 +89,36 @@ export function startGame3(container, onFinish) {
   // =========================
   // IMMENSE ZONE DE JEU
   // =========================
-  const canvasWidth = isMobile
-    ? window.innerWidth * 0.96
-    : window.innerWidth * 0.82;
+  const mapCols = 10;
+  const mapRows = 10;
+const frameSize = Math.floor(
+  Math.min(
+    isMobile ? window.innerWidth * 0.84 : window.innerWidth * 0.62,
+    isMobile ? window.innerHeight * 0.66 : window.innerHeight * 0.74,
+    720 // ← nouveau max
+  )
+);
+  const innerPadding = Math.max(
+    8,
+    Math.round(frameSize * 0.04)
+  );
 
-  const canvasHeight = isMobile
-    ? window.innerHeight * 0.72
-    : window.innerHeight * 0.84;
+  const tileSize = Math.floor(
+    (frameSize - innerPadding * 2) / mapCols
+  );
+
+  const canvasWidth = innerPadding * 2 + tileSize * mapCols;
+  // extra space at bottom to extend the black area visually
+  const bottomExtra = Math.round(tileSize * 6);
+  const canvasHeight = innerPadding * 2 + tileSize * mapRows + bottomExtra;
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  setResponsiveCanvas(
-    canvas,
-    canvasWidth,
-    canvasHeight
-  );
+  setResponsiveCanvas(canvas, canvasWidth, canvasHeight);
+
+  canvasWrapper.style.width = `${canvas.width}px`;
+  canvasWrapper.style.height = `${canvas.height}px`;
 
   // =========================
   // STYLE
@@ -120,17 +134,15 @@ export function startGame3(container, onFinish) {
   canvas.style.display =
     "block";
 
-  canvas.style.width =
-    "100%";
+  canvas.style.width = `${canvas.width}px`;
 
-  canvas.style.height =
-    "100%";
+  canvas.style.height = `${canvas.height}px`;
 
   canvas.style.maxWidth =
-    "96vw";
+    "none";
 
   canvas.style.maxHeight =
-    "90vh";
+    "none";
 
   canvas.style.boxShadow = `
     0 0 40px rgba(0,170,255,0.18),
@@ -142,38 +154,25 @@ export function startGame3(container, onFinish) {
   // =========================
   // CONFIG
   // =========================
-  const innerPadding =
-    canvas.width * 0.03;
-
-  const playableWidth =
-    canvas.width - innerPadding ;
-
-  const playableHeight =
-    canvas.height - innerPadding *2;
-
-  const tileSize =
-    Math.min(
-      playableWidth / 10,
-      playableHeight / 10
-    );
+  const playableWidth = canvas.width - innerPadding * 2;
+  const playableHeight = canvas.height - innerPadding * 2;
 
   // =========================
   // LEVEL
   // =========================
   const level = {
 
-    // More complex 10x10 maze (winding passages)
     map: [
-      [1,1,1,1,1,1,1,1,1,1],
-      [1,0,0,0,1,0,0,0,0,1],
-      [1,0,1,0,1,0,1,1,0,1],
-      [1,0,1,0,0,0,0,1,0,1],
+      [0,0,1,0,0,0,1,0,0,0],
+      [1,0,1,0,1,0,1,0,1,0],
+      [1,0,0,0,1,0,0,0,0,0],
+      [1,1,1,0,1,1,1,1,0,1],
+      [1,0,0,0,0,0,0,1,0,1],
       [1,0,1,1,1,1,0,1,0,1],
       [1,0,0,0,0,1,0,0,0,1],
-      [1,1,1,1,0,1,1,1,0,1],
-      [1,0,0,1,0,0,0,1,0,1],
-      [1,0,0,0,0,1,0,0,2,1],
-      [1,1,1,1,1,1,1,1,1,1]
+      [1,1,1,1,0,0,0,1,0,1],
+      [1,0,0,0,0,1,0,0,0,0],
+      [1,1,1,1,1,1,1,1,0,2]
     ],
 
     playerStart: {
@@ -181,6 +180,17 @@ export function startGame3(container, onFinish) {
       y: 0
     }
   };
+
+  const goalPosition = (() => {
+    for (let y = 0; y < level.map.length; y += 1) {
+      const x = level.map[y].indexOf(2);
+      if (x !== -1) {
+        return { x, y };
+      }
+    }
+
+    return { x: 0, y: 0 };
+  })();
 
   const hintCells = new Set([
     "0,1",
@@ -242,6 +252,7 @@ export function startGame3(container, onFinish) {
   };
 
   let trail = [];
+  let hasWon = false;
 
   const keys = {};
 
@@ -319,6 +330,10 @@ export function startGame3(container, onFinish) {
   // =========================
   function move(dx, dy) {
 
+    if (hasWon) {
+      return;
+    }
+
     const newX =
       player.x + dx;
 
@@ -343,14 +358,17 @@ export function startGame3(container, onFinish) {
       player.y = newY;
 
       if (hintCells.has(`${newX},${newY}`)) {
-        // reveal walls for 5 seconds when stepping on a hint cell
-        wallsRevealUntil = Date.now() + 5000;
+        wallsRevealUntil = Date.now() + 500;
       }
 
       // WIN
       if (
         level.map[newY][newX] === 2
       ) {
+
+        hasWon = true;
+        player.x = newX;
+        player.y = newY;
 
         const timeoutId =
           setTimeout(() => {
@@ -567,6 +585,15 @@ export function startGame3(container, onFinish) {
     ctx.fill();
 
     ctx.shadowBlur = 0;
+
+    // GOAL MARKER ON TOP: simple red arrival tile, same size as a maze cell
+    ctx.fillStyle = "#C1123F";
+    ctx.fillRect(
+      Math.round(innerPadding + goalPosition.x * tileSize),
+      Math.round(innerPadding + goalPosition.y * tileSize),
+      tileSize,
+      tileSize
+    );
   }
 
   // =========================

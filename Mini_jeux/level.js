@@ -40,7 +40,7 @@ const levels = [
   { game: 'game37', difficulty: 'hard', title: 'Game 37' },
   { game: 'game38', difficulty: 'hard', title: 'Game 38' },
   { game: 'game39', difficulty: 'hard', title: 'Game 39' },
-  { game: 'game40', difficulty: 'hard', title: 'Game 40' },
+  { game: 'game40', difficulty: 'hard', title: 'Rubik's' },
 ];
 
 // Get the next level
