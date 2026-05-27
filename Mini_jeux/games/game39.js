@@ -8,8 +8,7 @@ let game24 = {};
 
 export function startGame39(container, onFinish) {
    container.innerHTML = `
-       <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#2b1b10; padding:20px; border-radius:15px;">
-           <h2 style="margin:0 0 8px;">🍦 Ice Stack Deluxe v2 — Glaces réalistes</h2>
+       <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:0; border-radius:15px;">
            <p style="margin:0 0 8px; font-size:0.95em;">
                Empile les boules de glace sur le cornet.<br>
                <span style="color:#ffdd99;">La boule dont le parfum commence le plus tôt dans l'alphabet doit être en bas…</span>
@@ -34,8 +33,15 @@ export function startGame39(container, onFinish) {
 
 
 
-   const canvas = container.querySelector("#iceCanvas24");
-   const ctx = canvas.getContext("2d");
+    const canvas = container.querySelector("#iceCanvas24");
+    const ctx = canvas.getContext("2d");
+    const maxHeight = Math.min(window.innerHeight * 0.68, 600);
+    const maxWidthFromHeight = Math.floor(maxHeight * 1.5);
+    const canvasWidth = Math.max(540, Math.min(900, Math.floor(window.innerWidth * 0.92), maxWidthFromHeight));
+    const canvasHeight = Math.floor(canvasWidth / 1.5);
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
 
 
@@ -64,11 +70,18 @@ export function startGame39(container, onFinish) {
 
 
    const cone = {
-       x: 450,
-       y: 450,
-       w: 150,
-       h: 190
+       x: canvasWidth * 0.5,
+       y: canvasHeight * 0.75,
+       w: canvasWidth * (150 / 900),
+       h: canvasHeight * (190 / 600)
    };
+
+
+
+   const scoopRadius = Math.min(canvasWidth, canvasHeight) * (45 / 600);
+   const scoopBaseY = canvasHeight * (500 / 600);
+   const scoopStartX = canvasWidth * (120 / 900);
+   const scoopGapX = canvasWidth * (120 / 900);
 
 
 
@@ -77,11 +90,11 @@ export function startGame39(container, onFinish) {
        id: i,
        flavor: f.name,
        color: f.color,
-       x: 120 + i * 120,
-       y: 500,
-       r: 45,
-       homeX: 120 + i * 120,
-       homeY: 500,
+       x: scoopStartX + i * scoopGapX,
+       y: scoopBaseY,
+       r: scoopRadius,
+       homeX: scoopStartX + i * scoopGapX,
+       homeY: scoopBaseY,
        placedIndex: null,
        melting: false,
        meltProgress: 0,
@@ -102,6 +115,7 @@ export function startGame39(container, onFinish) {
        dragging: null,
        dragOffsetX: 0,
        dragOffsetY: 0,
+       scoopStackStep: scoopRadius * (55 / 45),
        gameOver: false
    };
 
@@ -210,10 +224,10 @@ function onMouseUp24() {
 function isOverCone24(s) {
    const c = game24.cone;
    return (
-       s.x > c.x - 60 &&
-       s.x < c.x + 60 &&
-       s.y > c.y - 220 &&
-       s.y < c.y + 20
+       s.x > c.x - game24.canvas.width * (60 / 900) &&
+       s.x < c.x + game24.canvas.width * (60 / 900) &&
+       s.y > c.y - game24.canvas.height * (220 / 600) &&
+       s.y < c.y + game24.canvas.height * (20 / 600)
    );
 }
 
@@ -227,7 +241,7 @@ function placeScoop24(s) {
 
 
    s.x = game24.cone.x;
-   s.y = game24.cone.y - index * 55;
+    s.y = game24.cone.y - index * game24.scoopStackStep;
    s.placedIndex = index;
 
 
@@ -550,8 +564,8 @@ function drawScoop24(ctx, s) {
        ctx.textAlign = "center";
        ctx.fillText(s.flavor, s.x, s.y + s.r + 20);
    }
-}
 
+}
 
 
 

@@ -39,7 +39,7 @@ const levels = [
   { game: 'game36', difficulty: 'hard', title: 'Pac Trap' },
   { game: 'game37', difficulty: 'hard', title: 'Neo Snake' },
   { game: 'game38', difficulty: 'hard', title: 'Cyber Diavola' },
-  { game: 'game39', difficulty: 'hard', title: 'Ice Stack' },
+  { game: 'game39', difficulty: 'hard', title: 'Ice Stack Deluxe' },
   { game: 'game40', difficulty: 'hard', title: 'Chromix' },
 ];
 
