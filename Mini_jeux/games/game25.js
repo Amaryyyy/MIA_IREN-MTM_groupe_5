@@ -4,25 +4,36 @@ let game23 = {};
 
 export function startGame25(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#050509; padding:20px; border-radius:15px;">
+        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:20px; border-radius:15px; max-width:960px; margin:0 auto; overflow:hidden; display:flex; flex-direction:column; align-items:center; gap:10px;">
             <h2 style="margin:0 0 8px;">🧩 Color Slots — Ice Board Neon Edition</h2>
             <p style="margin:0 0 8px; font-size:0.95em;">
-                Place chaque pièce au centre du trou de la même couleur.<br>
-                <span style="color:#7df9ff;">Ignore totalement la forme</span>.
-            </p>
 
             <canvas id="shapeCanvas23" width="900" height="650"
-                style="border:4px solid #7df9ff; border-radius:8px; box-shadow:0 0 25px #7df9ffaa; background:#0a0f1f;">
+                style="border-radius:8px; background:transparent; display:block; max-width:100%; height:auto;">
             </canvas>
 
             <p id="msg23" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-                Fais correspondre la couleur de la pièce avec la couleur du contour du trou.
             </p>
         </div>
     `;
 
     const canvas = container.querySelector("#shapeCanvas23");
     const ctx = canvas.getContext("2d");
+    const baseWidth = canvas.width;
+    const baseHeight = canvas.height;
+
+    function resizeCanvas23() {
+        const availableWidth = Math.max(320, Math.min(window.innerWidth - 32, 920));
+        const availableHeight = Math.max(360, window.innerHeight - 250);
+        const scale = Math.min(
+            availableWidth / baseWidth,
+            availableHeight / baseHeight,
+            1
+        );
+
+        canvas.style.width = `${Math.floor(baseWidth * scale)}px`;
+        canvas.style.height = `${Math.floor(baseHeight * scale)}px`;
+    }
 
     /* ---------- COULEURS NÉON ---------- */
     const COLORS = {
@@ -37,30 +48,38 @@ export function startGame25(container, onFinish) {
 
     /* ---------- PLATEAU CARRÉ ---------- */
     const board = {
-        x: 150,
-        y: 50,
-        size: 600
+        x: 225,
+        y: 40,
+        size: 450
     };
 
     /* ---------- SLOTS (TROUS) ---------- */
     const slots = [
-        { id: "S1", x: 300, y: 180, shape: "hex",     colorKey: "cyan",    filledBy: null },
-        { id: "S2", x: 450, y: 180, shape: "circle",  colorKey: "magenta", filledBy: null },
-        { id: "S3", x: 600, y: 180, shape: "triangle",colorKey: "lime",    filledBy: null },
-        { id: "S4", x: 350, y: 350, shape: "cross",   colorKey: "violet",  filledBy: null },
-        { id: "S5", x: 550, y: 350, shape: "drop",    colorKey: "orange",  filledBy: null },
-        { id: "S6", x: 450, y: 500, shape: "diamond", colorKey: "pink",    filledBy: null }
+        { id: "S1", x: 305, y: 160, shape: "hex",     colorKey: "cyan",    filledBy: null },
+        { id: "S2", x: 450, y: 160, shape: "circle",  colorKey: "magenta", filledBy: null },
+        { id: "S3", x: 595, y: 160, shape: "triangle",colorKey: "lime",    filledBy: null },
+        { id: "S4", x: 305, y: 320, shape: "cross",   colorKey: "violet",  filledBy: null },
+        { id: "S5", x: 450, y: 320, shape: "drop",    colorKey: "orange",  filledBy: null },
+        { id: "S6", x: 595, y: 320, shape: "diamond", colorKey: "pink",    filledBy: null }
     ];
 
     /* ---------- PIÈCES (FORMES 3D NÉON) ---------- */
-    const pieces = [
-        { id: "P1", shape: "circle",   colorKey: "cyan",    x: 120, y: 580, w: 80, h: 80, homeX: 120, homeY: 580, slotId: null },
-        { id: "P2", shape: "triangle", colorKey: "magenta", x: 260, y: 580, w: 80, h: 80, homeX: 260, homeY: 580, slotId: null },
-        { id: "P3", shape: "hex",      colorKey: "lime",    x: 400, y: 580, w: 80, h: 80, homeX: 400, homeY: 580, slotId: null },
-        { id: "P4", shape: "drop",     colorKey: "violet",  x: 540, y: 580, w: 80, h: 80, homeX: 540, homeY: 580, slotId: null },
-        { id: "P5", shape: "cross",    colorKey: "orange",  x: 680, y: 580, w: 80, h: 80, homeX: 680, homeY: 580, slotId: null },
-        { id: "P6", shape: "diamond",  colorKey: "pink",    x: 820, y: 580, w: 80, h: 80, homeX: 820, homeY: 580, slotId: null }
-    ];
+    const pieceSize = 90;
+    const shapes = ["circle","triangle","hex","drop","cross","diamond"];
+    const colorKeys = ["cyan","magenta","lime","violet","orange","pink"];
+    const pieces = [];
+    const cols = 3;
+    const hGap = (board.size - cols * pieceSize) / (cols + 1);
+    const startX = board.x + hGap;
+    const row1Y = board.y + board.size - 40; // slightly overlapping the board for visual balance
+    const row2Y = row1Y + pieceSize + 10;
+
+    for (let c = 0; c < cols; c++) {
+        const x1 = Math.round(startX + c * (pieceSize + hGap));
+        const x2 = x1; // same columns for second row
+        pieces.push({ id: `P${c + 1}`, shape: shapes[c], colorKey: colorKeys[c], x: x1, y: row1Y, w: pieceSize, h: pieceSize, homeX: x1, homeY: row1Y, slotId: null });
+        pieces.push({ id: `P${c + 4}`, shape: shapes[c + 3], colorKey: colorKeys[c + 3], x: x2, y: row2Y, w: pieceSize, h: pieceSize, homeX: x2, homeY: row2Y, slotId: null });
+    }
 
     game23 = {
         ctx,
@@ -80,6 +99,9 @@ export function startGame25(container, onFinish) {
     canvas.addEventListener("mousemove", onMouseMove23);
     canvas.addEventListener("mouseup", onMouseUp23);
     canvas.addEventListener("mouseleave", onMouseUp23);
+    window.addEventListener("resize", resizeCanvas23);
+
+    resizeCanvas23();
 
     render23();
 }
@@ -90,8 +112,10 @@ function onMouseDown23(e) {
     if (game23.gameOver) return;
 
     const rect = game23.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = game23.canvas.width / rect.width;
+    const scaleY = game23.canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     for (let i = game23.pieces.length - 1; i >= 0; i--) {
         const p = game23.pieces[i];
@@ -110,8 +134,10 @@ function onMouseMove23(e) {
     if (game23.draggingIndex == null) return;
 
     const rect = game23.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = game23.canvas.width / rect.width;
+    const scaleY = game23.canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     const p = game23.pieces[game23.pieces.length - 1];
     p.x = x - game23.dragOffsetX;
@@ -137,10 +163,8 @@ function onMouseUp23() {
             p.y = slot.y - p.h / 2;
             p.slotId = slot.id;
             slot.filledBy = p.id;
-            setMsg23("✔️ Parfait ! La couleur avant la forme.");
             if (checkWin23()) endGame23();
         } else {
-            setMsg23("❌ Mauvaise couleur ou pas assez centré.");
             resetPiecePosition23(p);
         }
     } else {
@@ -189,6 +213,9 @@ function render23() {
     const ctx = game23.ctx;
     const canvas = game23.canvas;
 
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     drawIceBackground23(ctx, canvas);
     drawIceBoard23(ctx, game23.board);
 
@@ -200,8 +227,8 @@ function render23() {
 
 function drawIceBackground23(ctx, canvas) {
     const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, "#0a0f1f");
-    grad.addColorStop(1, "#0d1228");
+    grad.addColorStop(0, "rgba(125, 249, 255, 0.10)");
+    grad.addColorStop(1, "rgba(185, 224, 255, 0.04)");
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
@@ -261,7 +288,7 @@ function drawPiece23(ctx, p, neon) {
     ctx.lineWidth = 2;
 
     ctx.beginPath();
-    drawShapePath23(ctx, p.shape, x + w / 2, y + h / 2, Math.min(w, h) / 2 - 6);
+    drawShapePath23(ctx, p.shape, x + w / 2, y + h / 2, Math.min(w, h) / 2);
     ctx.fill();
     ctx.stroke();
 
