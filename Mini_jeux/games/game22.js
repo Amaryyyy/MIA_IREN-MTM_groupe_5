@@ -190,7 +190,7 @@ function lockPiece20() {
         return;
     }
 
-    if (isGridFull20()) {
+    if (isGridMoreThanHalfFull20()) {
         endGame20(true);
         return;
     }
@@ -200,13 +200,17 @@ function lockPiece20() {
 
 /* ---------- FULL GRID CHECK ---------- */
 
-function isGridFull20() {
+function isGridMoreThanHalfFull20() {
+    let filled = 0;
+    const total = game20.rows * game20.cols;
+
     for (let r = 0; r < game20.rows; r++) {
         for (let c = 0; c < game20.cols; c++) {
-            if (!game20.grid[r][c]) return false;
+            if (game20.grid[r][c]) filled++;
         }
     }
-    return true;
+
+    return filled > total * 0.5;
 }
 
 function hasIrrecoverableHole20() {
