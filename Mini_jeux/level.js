@@ -1,7 +1,7 @@
 // Level management module
 
 const levels = [
-  { game: 'game25', difficulty: 'easy', title: 'Reverse Maze'},
+  { game: 'game1', difficulty: 'easy', title: 'Reverse Maze'},
   { game: 'game2', difficulty: 'easy', title: 'Color Hack'},
   { game: 'game3', difficulty: 'easy', title: 'Invisible Maze'},
   { game: 'game4', difficulty: 'medium', title: 'Mysterious Enigma'},
