@@ -16,7 +16,7 @@ export function startGame24(container, onFinish) {
             </canvas>
 
             <p id="msg22" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-                Objectif : remplir le réservoir à 100%. Observe la contre-logique des robinets.
+                Objectif : remplir le réservoir à 60%. Observe la contre-logique des robinets.
             </p>
         </div>
     `;
@@ -295,9 +295,9 @@ function setMsg22(text) {
 }
 
 function checkWin22() {
-    if (game22.reservoir >= 100 && !game22.gameOver) {
+    if (game22.reservoir >= 60 && !game22.gameOver) {
         game22.gameOver = true;
-        setMsg22("🎉 Tu as compris la contre-logique des robinets et rempli le réservoir !");
+        setMsg22("🎉 Tu as atteint 60% du réservoir et compris la contre-logique des robinets !");
         setTimeout(() => game22.onFinish && game22.onFinish(), 1500);
     }
 }

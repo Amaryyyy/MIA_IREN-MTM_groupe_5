@@ -3,19 +3,13 @@ let game21 = {};
 
 export function startGame23(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#050509; padding:20px; border-radius:15px;">
-            <h2 style="margin:0 0 8px;">🁢 Dominos inversés — Puzzle à solution unique</h2>
-            <p style="margin:0 0 8px; font-size:0.95em;">
-                Sélectionne un domino en bas, puis clique sur un emplacement vide à gauche ou à droite du centre.<br>
-                Règle inversée : <span style="color:#afff9f;">le nombre à l'extrémité opposée du domino posé doit être égal au nombre à l'extrémité opposée du domino déjà posé</span>.
-            </p>
-
+        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:20px; border-radius:15px;">
             <canvas id="dominoCanvas21" width="900" height="400"
-                style="border:4px solid #f5e0b8; border-radius:8px; box-shadow:0 0 25px #f5e0b8aa; background:#06202a;">
+                        style="border:4px solid #f5e0b8; border-radius:8px; box-shadow:0 0 25px #f5e0b8aa; background:#06202a; touch-action:none; cursor:grab;">
             </canvas>
 
-            <p id="msg21" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-                Sélectionne un domino dans la réserve, puis clique sur un emplacement vide.
+            <p id="msg21" style="margin-top:8px; min-height:24px; max-width:900px; line-height:1.15; font-size:1.05em; pointer-events:none;">
+                Glisse un domino depuis la réserve vers un emplacement vide.
             </p>
         </div>
     `;
@@ -59,15 +53,16 @@ export function startGame23(container, onFinish) {
         { left: 5, right: 4 }, // R3
         { left: 1, right: 6 }, // L1
         { left: 6, right: 0 }, // L2
-        { left: 0, right: 5 }  // L3
+        { left: 0, right: 5 }, // L3
+        { left: 5, right: 5 }   // Piège : ne correspond à aucune extrémité utile
     ];
 
     // Réserve en bas
     const poolLayout = pool.map((d, i) => ({
         x: 80 + i * 120,
-        y: canvas.height - 110,
-        w: 80,
-        h: 100
+        y: canvas.height - 70,
+        w: dominoWidth,
+        h: dominoHeight
     }));
 
     game21 = {
@@ -79,12 +74,20 @@ export function startGame23(container, onFinish) {
         pool,
         poolLayout,
         selectedPoolIndex: null,
+        isDragging: false,
+        dragX: 0,
+        dragY: 0,
+        dragOffsetX: 0,
+        dragOffsetY: 0,
+        messageTimer: null,
         gameOver: false,
         dominoWidth,
         dominoHeight
     };
 
-    canvas.addEventListener("click", onCanvasClick21);
+    canvas.addEventListener("mousedown", onCanvasMouseDown21);
+    window.addEventListener("mousemove", onCanvasMouseMove21);
+    window.addEventListener("mouseup", onCanvasMouseUp21);
     render21();
 }
 
@@ -127,59 +130,124 @@ function canPlaceDomino21(domino, slot) {
 
 /* ---------- INPUT ---------- */
 
-function onCanvasClick21(e) {
-    if (game21.gameOver) return;
-
+function getCanvasPoint21(e) {
     const rect = game21.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
 
-    // 1) Sélection dans la réserve
+function findPoolIndexAt21(x, y) {
     for (let i = 0; i < game21.poolLayout.length; i++) {
         const pl = game21.poolLayout[i];
-        if (
-            x >= pl.x && x <= pl.x + pl.w &&
-            y >= pl.y && y <= pl.y + pl.h &&
-            game21.pool[i]
-        ) {
-            game21.selectedPoolIndex = i;
-            document.getElementById("msg21").textContent =
-                "Domino sélectionné. Clique sur un emplacement vide à gauche ou à droite.";
-            render21();
-            return;
+        const domino = game21.pool[i];
+        if (!domino) continue;
+        if (x >= pl.x && x <= pl.x + pl.w && y >= pl.y && y <= pl.y + pl.h) {
+            return i;
         }
     }
+    return null;
+}
 
-    // 2) Placement sur un slot vide
-    if (game21.selectedPoolIndex != null) {
-        const slot = nearestEmptySlot21(x, y);
-        if (!slot) return;
+function startDragFromPoolIndex21(index, x, y) {
+    const pl = game21.poolLayout[index];
+    game21.selectedPoolIndex = index;
+    game21.isDragging = true;
+    game21.dragX = x;
+    game21.dragY = y;
+    game21.dragOffsetX = x - (pl.x + pl.w / 2);
+    game21.dragOffsetY = y - (pl.y + pl.h / 2);
+    setMsg21("Glisse le domino vers un emplacement vide puis relâche.");
+    render21();
+}
 
-        const domino = game21.pool[game21.selectedPoolIndex];
+function onCanvasMouseDown21(e) {
+    if (game21.gameOver) return;
 
-        if (!canPlaceDomino21(domino, slot)) {
-            document.getElementById("msg21").textContent =
-                "❌ Mauvais domino pour cet emplacement (règle inversée non respectée).";
-            return;
-        }
+    const { x, y } = getCanvasPoint21(e);
+    const index = findPoolIndexAt21(x, y);
 
-        // Placement
-        game21.boardDominos.push({
-            slotId: slot.id,
-            left: domino.left,
-            right: domino.right
-        });
-        slot.occupied = true;
-        game21.pool[game21.selectedPoolIndex] = null;
-        game21.selectedPoolIndex = null;
+    if (index == null) {
+        if (game21.selectedPoolIndex == null) return;
+        game21.isDragging = false;
+        return;
+    }
 
-        if (checkWin21()) {
-            endGame21(true);
-            return;
-        }
+    startDragFromPoolIndex21(index, x, y);
+}
 
-        document.getElementById("msg21").textContent = "✔️ Bien joué. Continue.";
+function onCanvasMouseMove21(e) {
+    if (!game21.isDragging || game21.selectedPoolIndex == null || game21.gameOver) return;
+
+    const { x, y } = getCanvasPoint21(e);
+    game21.dragX = x;
+    game21.dragY = y;
+    render21();
+}
+
+function onCanvasMouseUp21(e) {
+    if (game21.gameOver) return;
+    if (game21.selectedPoolIndex == null) {
+        game21.isDragging = false;
+        return;
+    }
+
+    const { x, y } = getCanvasPoint21(e);
+    const slot = nearestEmptySlot21(x, y);
+
+    if (!slot) {
+        game21.isDragging = false;
         render21();
+        return;
+    }
+
+    const domino = game21.pool[game21.selectedPoolIndex];
+
+    if (!canPlaceDomino21(domino, slot)) {
+        setMsg21("❌ Mauvais domino pour cet emplacement", 220);
+        game21.isDragging = false;
+        render21();
+        return;
+    }
+
+    game21.boardDominos.push({
+        slotId: slot.id,
+        left: domino.left,
+        right: domino.right
+    });
+    slot.occupied = true;
+    game21.pool[game21.selectedPoolIndex] = null;
+    game21.selectedPoolIndex = null;
+    game21.isDragging = false;
+
+    if (checkWin21()) {
+        endGame21(true);
+        return;
+    }
+
+    setMsg21("✔️ Bien joué. Continue.", 320);
+    render21();
+}
+
+function setMsg21(text, duration = 0) {
+    const msg = document.getElementById("msg21");
+    if (!msg) return;
+
+    if (game21.messageTimer) {
+        clearTimeout(game21.messageTimer);
+        game21.messageTimer = null;
+    }
+
+    msg.textContent = text;
+
+    if (duration > 0) {
+        game21.messageTimer = setTimeout(() => {
+            if (msg.textContent === text) {
+                msg.textContent = "Glisse un domino depuis la réserve vers un emplacement vide.";
+            }
+            game21.messageTimer = null;
+        }, duration);
     }
 }
 
@@ -191,7 +259,7 @@ function nearestEmptySlot21(x, y) {
         const dx = x - s.x;
         const dy = y - s.y;
         const d = dx * dx + dy * dy;
-        if (d < bestDist && d < 60 * 60) {
+        if (d < bestDist && d < 72 * 72) {
             bestDist = d;
             best = s;
         }
@@ -258,6 +326,8 @@ function render21() {
 
         const selected = game21.selectedPoolIndex === i;
 
+        if (selected && game21.isDragging) continue;
+
         ctx.save();
         ctx.translate(pl.x + pl.w / 2, pl.y + pl.h / 2);
         drawDomino21(
@@ -269,6 +339,26 @@ function render21() {
             domino.left,
             domino.right,
             selected
+        );
+        ctx.restore();
+    }
+
+    // Domino en cours de déplacement
+    if (game21.selectedPoolIndex != null && game21.isDragging) {
+        const domino = game21.pool[game21.selectedPoolIndex];
+        const pl = game21.poolLayout[game21.selectedPoolIndex];
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        ctx.translate(game21.dragX - game21.dragOffsetX, game21.dragY - game21.dragOffsetY);
+        drawDomino21(
+            ctx,
+            -pl.w / 2,
+            -pl.h / 2,
+            pl.w,
+            pl.h,
+            domino.left,
+            domino.right,
+            true
         );
         ctx.restore();
     }

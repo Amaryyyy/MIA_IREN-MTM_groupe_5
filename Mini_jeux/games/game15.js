@@ -6,7 +6,7 @@ export function startGame15(container, onFinish) {
    container.innerHTML = `
        <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: #f7fbff; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 10px;">
            <div style="font-size: 1.05em; margin-bottom: 2px; color: rgba(247, 251, 255, 0.92); text-shadow: 0 0 10px rgba(46, 232, 255, 0.35), 0 0 18px rgba(158, 99, 255, 0.25); letter-spacing: 0.03em;">📦 Mouvements : <span id="moves" style="color: #7dff9b; text-shadow: 0 0 8px rgba(125, 255, 155, 0.75);">0</span></div>
-           <canvas id="gameCanvas" width="480" height="480" style="border: none; border-radius: 8px; box-shadow: 0 0 10px rgb(251, 255, 0), 0 0 18px rgba(139,92,246,0.72), 0 0 36px rgba(0,170,255,0.28); cursor: grab; background: transparent;"></canvas>
+           <canvas id="gameCanvas" width="480" height="480" style="border: none; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 244, 70, 0.9), 0 0 22px rgba(255, 225, 0, 0.78), 0 0 38px rgba(255, 199, 0, 0.62), 0 0 62px rgba(139,92,246,0.34), 0 0 84px rgba(0,170,255,0.14); cursor: grab; background: transparent;"></canvas>
            <p id="gameMessage" style="margin: 6px 0 0; font-weight: 700; min-height: 24px; color: rgba(247, 251, 255, 0.95); text-shadow: 0 0 8px rgba(46, 232, 255, 0.28), 0 0 14px rgba(0, 0, 0, 0.35); letter-spacing: 0.02em;">Trouvez la sortie... 👀</p>
        </div>
    `;
