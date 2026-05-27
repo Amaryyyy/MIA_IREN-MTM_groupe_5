@@ -2,10 +2,20 @@ import { gameManager } from "../gameCleanup.js";let game20 = {};
 
 export function startGame22(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:20px; border-radius:15px;">
+        <div id="game22Wrap" style="position:relative; text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:20px; border-radius:15px; overflow:hidden;">
             <canvas id="tetrisCanvas20" width="200" height="400"
                 style="border:4px solid #6f7cff; border-radius:8px; box-shadow:0 0 25px rgba(111,124,255,0.28); background:#050509;">
             </canvas>
+            <div id="game22Victory" style="display:none; position:absolute; inset:0; z-index:5; align-items:center; justify-content:center; background:rgba(5,5,9,0.72); backdrop-filter:blur(3px);">
+                <div style="position:relative; width:100%; height:100%; overflow:hidden;">
+                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+                        <div style="padding:18px 28px; border:3px solid #6f7cff; border-radius:16px; background:rgba(7,8,16,0.92); box-shadow:0 0 30px rgba(111,124,255,0.45), 0 0 60px rgba(0,229,255,0.15); text-transform:uppercase; letter-spacing:3px; font-size:42px; color:#ffffff; text-shadow:0 0 14px rgba(255,255,255,0.7), 0 0 22px rgba(111,124,255,0.55);">
+                            You Won
+                        </div>
+                    </div>
+                    <div id="game22Confetti" aria-hidden="true" style="position:absolute; inset:0; pointer-events:none;"></div>
+                </div>
+            </div>
         </div>
     `;
 
@@ -25,6 +35,7 @@ export function startGame22(container, onFinish) {
         currentY: 0,
         currentShapeIndex: 0,
         gameOver: false,
+        won: false,
         dropInterval: 600,
         lastDrop: 0
     };
@@ -317,6 +328,8 @@ function render20() {
             }
         }
     }
+
+    renderVictory20();
 }
 
 function drawCell20(cx, cy, color, glow = false) {
@@ -371,5 +384,83 @@ function rotateMatrix20(mat) {
 
 function endGame20(win) {
     game20.gameOver = true;
+    game20.won = win;
+    if (win) {
+        showVictory20();
+    }
     setTimeout(() => game20.onFinish && game20.onFinish(), 1500);
+}
+
+function showVictory20() {
+    const overlay = document.getElementById("game22Victory");
+    const confettiHost = document.getElementById("game22Confetti");
+
+    if (overlay) {
+        overlay.style.display = "flex";
+    }
+
+    if (!confettiHost || confettiHost.dataset.spawned === "true") return;
+    confettiHost.dataset.spawned = "true";
+    confettiHost.innerHTML = "";
+
+    const colors = ["#00e5ff", "#ff3860", "#ff9df8", "#afff9f", "#f5e960", "#9f86ff", "#ffb86c", "#ffffff"];
+    const pieceCount = 90;
+
+    for (let i = 0; i < pieceCount; i++) {
+        const piece = document.createElement("span");
+        const size = 6 + Math.random() * 8;
+        const left = Math.random() * 100;
+        const delay = Math.random() * 1.1;
+        const duration = 2.6 + Math.random() * 2.8;
+        const drift = (Math.random() * 2 - 1) * 110;
+        const spin = (Math.random() * 2 - 1) * 540;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        piece.style.position = "absolute";
+        piece.style.left = `${left}%`;
+        piece.style.top = "-12%";
+        piece.style.width = `${size}px`;
+        piece.style.height = `${size * (0.45 + Math.random() * 0.9)}px`;
+        piece.style.borderRadius = Math.random() > 0.5 ? "999px" : "2px";
+        piece.style.background = color;
+        piece.style.boxShadow = `0 0 10px ${color}`;
+        piece.style.opacity = String(0.85 + Math.random() * 0.15);
+        piece.style.transform = `translate3d(0, 0, 0) rotate(${Math.random() * 360}deg)`;
+        piece.style.setProperty("--fall-duration", `${duration}s`);
+        piece.style.setProperty("--fall-delay", `${delay}s`);
+        piece.style.setProperty("--drift", `${drift}px`);
+        piece.style.setProperty("--spin", `${spin}deg`);
+        piece.style.animation = `game22ConfettiFall var(--fall-duration) linear var(--fall-delay) forwards`;
+
+        confettiHost.appendChild(piece);
+    }
+
+    if (!document.getElementById("game22ConfettiStyles")) {
+        const style = document.createElement("style");
+        style.id = "game22ConfettiStyles";
+        style.textContent = `
+            @keyframes game22ConfettiFall {
+                0% {
+                    transform: translate3d(0, -18px, 0) rotate(0deg);
+                }
+                100% {
+                    transform: translate3d(var(--drift), 470px, 0) rotate(var(--spin));
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function renderVictory20() {
+    if (!game20.won) return;
+
+    const confettiHost = document.getElementById("game22Confetti");
+    if (!confettiHost) return;
+
+    const pieces = confettiHost.children;
+    for (const piece of pieces) {
+        const currentOpacity = parseFloat(piece.style.opacity || "1");
+        piece.style.opacity = String(Math.max(0, currentOpacity - 0.0025));
+    }
 }

@@ -18,7 +18,7 @@ export function startGame35(container, onFinish) {
   // VARIABLES AVANT UTILISATION
   const cols = 25;
   const rows = 15;
-  const cellSize = 36;
+  const cellSize = Math.max(18, Math.floor(Math.min((window.innerWidth * 0.9) / cols, (window.innerHeight * 0.65) / rows)));
 
   const canvas = document.createElement("canvas");
   canvas.width = cols * cellSize;

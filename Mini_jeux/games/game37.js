@@ -18,10 +18,17 @@ export function startGame37(container, onFinish) {
   status.style.margin = "6px 0";
   status.style.color = "#bfeaff";
 
+  // --- CONFIG ---
+  const grid = 20;
+  const canvasSize = Math.max(
+    grid * 8,
+    Math.floor(Math.min(window.innerWidth * 0.9, window.innerHeight * 0.65) / grid) * grid
+  );
+
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
-  canvas.width = 520;
-  canvas.height = 520;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
   canvas.style.border = "2px solid #4fc3f7";
   canvas.style.background = "#031526";
 
@@ -29,8 +36,6 @@ export function startGame37(container, onFinish) {
   container.appendChild(status);
   container.appendChild(canvas);
 
-  // --- CONFIG ---
-  const grid = 20;
   const cols = canvas.width / grid;
   const rows = canvas.height / grid;
 
