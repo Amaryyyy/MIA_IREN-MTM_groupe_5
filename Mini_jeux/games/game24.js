@@ -24,6 +24,19 @@ export function startGame24(container, onFinish) {
     const canvas = container.querySelector("#tapCanvas22");
     const ctx = canvas.getContext("2d");
 
+    // preload spritesheet for pipes
+    const sprite = new Image();
+    sprite.src = "assets/images/Tuyaux.jpg";
+    // sprite source rectangles (approximate) - adjust if needed
+    const spriteRects = {
+        straight: { x: 20, y: 20, w: 280, h: 80 },
+        elbow: { x: 20, y: 120, w: 180, h: 220 },
+        faucet: { x: 220, y: 20, w: 180, h: 140 },
+        cross: { x: 220, y: 180, w: 160, h: 180 },
+        ysplit: { x: 420, y: 20, w: 180, h: 220 },
+        cracked: { x: 620, y: 20, w: 240, h: 200 }
+    };
+
     game22 = {
         ctx,
         canvas,
@@ -34,6 +47,23 @@ export function startGame24(container, onFinish) {
             C: false,
             D: false
         },
+        // point de jonction pour le réseau de tuyaux
+        pipeJunction: { x: canvas.width / 2, y: canvas.height / 2 },
+        // connexions entre robinets et la jonction
+        pipes: [
+            { from: 'A', to: 'junction' },
+            { from: 'B', to: 'junction' },
+            { from: 'C', to: 'junction' }
+        ],
+        // pieces: represent if the pipe between tap and junction is oriented/connected
+        pieces: {
+            A: { connected: true },
+            B: { connected: true },
+            C: { connected: true },
+            junctionToReservoir: { connected: true }
+        },
+        sprite,
+        spriteRects,
         flowDir: 1,       // 1 = remplit, -1 = vide
         dEnabled: true,   // C active/désactive D comme source
         aMode: 1,         // 1 = inversion simple, 2 = double inversion
@@ -74,8 +104,36 @@ function onCanvasClick22(e) {
     const y = e.clientY - rect.top;
 
     const tap = tapAt22(x, y);
-    if (!tap) return;
+    if (!tap) {
+        // check if clicked on a pipe segment (toggle piece connection)
+        for (const p of game22.pipes) {
+            const from = p.from === 'junction' ? game22.pipeJunction : game22.tapLayout[p.from];
+            const to = p.to === 'junction' ? game22.pipeJunction : game22.tapLayout[p.to];
+            const d = pointToSegmentDistance22({ x, y }, from, to);
+            if (d < 18) {
+                // toggle piece for this pipe
+                if (game22.pieces && game22.pieces[p.from]) {
+                    game22.pieces[p.from].connected = !game22.pieces[p.from].connected;
+                    setMsg22(`Tu as basculé la pièce ${p.from} => ${game22.pieces[p.from].connected ? 'CONNECTÉE' : 'DÉCONNECTÉE'}`);
+                    render22();
+                    return;
+                }
+            }
+        }
+        // click near junction->reservoir
+        const junction = game22.pipeJunction;
+        const jrMid = { x: junction.x, y: junction.y + 25 };
+        const dj = Math.hypot(x - jrMid.x, y - jrMid.y);
+        if (dj < 20 && game22.pieces && game22.pieces.junctionToReservoir) {
+            game22.pieces.junctionToReservoir.connected = !game22.pieces.junctionToReservoir.connected;
+            setMsg22(`Jonction→benne ${game22.pieces.junctionToReservoir.connected ? 'CONNECTÉE' : 'DÉCONNECTÉE'}`);
+            render22();
+            return;
+        }
+        return;
+    }
 
+    // If clicked directly on a tap handle, handle tap logic
     handleTapLogic22(tap);
     render22();
     checkWin22();
@@ -91,11 +149,29 @@ function tapAt22(x, y) {
     return null;
 }
 
+function pointToSegmentDistance22(p, a, b) {
+    const abx = b.x - a.x;
+    const aby = b.y - a.y;
+    const apx = p.x - a.x;
+    const apy = p.y - a.y;
+    const ab2 = abx * abx + aby * aby;
+    if (ab2 === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+    let t = (apx * abx + apy * aby) / ab2;
+    t = Math.max(0, Math.min(1, t));
+    const projx = a.x + abx * t;
+    const projy = a.y + aby * t;
+    return Math.hypot(p.x - projx, p.y - projy);
+}
+
 function handleTapLogic22(tap) {
     const state = game22;
 
     // 1) On "tourne" le robinet : on inverse son état (ouvert/fermé)
     state.taps[tap] = !state.taps[tap];
+    // Rotation visuelle / bascule de la pièce associée (simule rotation)
+    if (state.pieces && state.pieces[tap]) {
+        state.pieces[tap].connected = !state.pieces[tap].connected;
+    }
 
     // 2) Effets secondaires non intuitifs
     if (tap === "A") {
@@ -118,12 +194,15 @@ function handleTapLogic22(tap) {
     // 3) L'eau sort du robinet opposé
     const oppositeMap = { A: "C", C: "A", B: "D", D: "B" };
     const source = oppositeMap[tap];
-
-    let canFlow = state.taps[source];
-
-    // D ne peut être source que si dEnabled est true
-    if (source === "D" && !state.dEnabled) {
-        canFlow = false;
+    // Source must be open AND its piece connected to junction AND junction->reservoir connected
+    let canFlow = !!state.taps[source];
+    if (source === "D" && !state.dEnabled) canFlow = false;
+    // check pieces connectivity
+    if (canFlow) {
+        const piece = state.pieces && state.pieces[source];
+        const jr = state.pieces && state.pieces.junctionToReservoir;
+        if (piece && !piece.connected) canFlow = false;
+        if (jr && !jr.connected) canFlow = false;
     }
 
     if (canFlow) {
@@ -134,11 +213,11 @@ function handleTapLogic22(tap) {
 
         const dirText = state.flowDir === 1 ? "remplit" : "vide";
         setMsg22(
-            `L'eau sort de ${source} et ${dirText} le réservoir (${state.reservoir}%).`
+            `L'eau sort de ${source} (pièce connectée) et ${dirText} le réservoir (${state.reservoir}%).`
         );
     } else {
         setMsg22(
-            `Tu as tourné ${tap}, mais l'eau ne coule pas : le robinet opposé n'est pas prêt.`
+            `Tu as tourné ${tap}, mais l'eau ne coule pas : vérifie les pièces/tuyaux.`
         );
     }
 }
@@ -163,6 +242,9 @@ function render22() {
     ctx.lineTo(canvas.width - 200, canvas.height / 2);
     ctx.stroke();
 
+    // Dessine le réseau de tuyaux reliant A, B, C à la jonction
+    drawPipes22(ctx);
+
     // Robinets
     for (const key of Object.keys(game22.tapLayout)) {
         const t = game22.tapLayout[key];
@@ -174,6 +256,131 @@ function render22() {
 
     // Réservoir
     drawReservoir22(ctx);
+}
+
+function drawPipes22(ctx) {
+    const junction = game22.pipeJunction;
+
+    ctx.save();
+    // pipe body
+    ctx.strokeStyle = '#16343f';
+    ctx.lineWidth = 14;
+    ctx.lineCap = 'round';
+
+    for (const p of game22.pipes) {
+        const from = p.from === 'junction' ? junction : game22.tapLayout[p.from];
+        const to = p.to === 'junction' ? junction : game22.tapLayout[p.to];
+        // determine if this pipe is currently connected (piece state)
+        const key = p.from;
+        const piece = game22.pieces && game22.pieces[key];
+        const active = piece ? piece.connected : true;
+        // If sprite sheet loaded, draw sprite oriented between points
+        if (game22.sprite && game22.spriteRects) {
+            const dx = to.x - from.x;
+            const dy = to.y - from.y;
+            const len = Math.hypot(dx, dy);
+            const ang = Math.atan2(dy, dx);
+            const midx = (from.x + to.x) / 2;
+            const midy = (from.y + to.y) / 2;
+
+            // choose a sprite variant based on index to use different tiles from the sheet
+            const variants = Object.keys(game22.spriteRects);
+            const idx = game22.pipes.indexOf(p) % variants.length;
+            const name = variants[idx];
+            const rect = game22.spriteRects[name];
+
+            const tileH = 60; // draw height for pipe tile
+
+            ctx.save();
+            ctx.translate(midx, midy);
+            ctx.rotate(ang);
+            try {
+                ctx.drawImage(game22.sprite, rect.x, rect.y, rect.w, rect.h, -len / 2, -tileH / 2, len, tileH);
+            } catch (e) {
+                // fallback to simple line on error
+                ctx.beginPath();
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.strokeStyle = '#16343f';
+                ctx.lineWidth = 14;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // overlay inner color to indicate active/inactive
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.strokeStyle = active ? '#2b6b85' : '#444';
+            ctx.lineWidth = 6;
+            ctx.stroke();
+
+            continue;
+        }
+    }
+
+    // Draw junction circle
+    ctx.fillStyle = '#0f2a33';
+    ctx.strokeStyle = '#7fd3ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(junction.x, junction.y, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // draw pipe from junction to reservoir and show active/inactive
+    const jr = game22.pieces && game22.pieces.junctionToReservoir;
+    const jrActive = jr ? jr.connected : true;
+    const rx = junction.x;
+    const ry = junction.y + 50;
+    if (game22.sprite && game22.spriteRects) {
+        const from = junction;
+        const to = { x: rx, y: ry };
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const len = Math.hypot(dx, dy);
+        const ang = Math.atan2(dy, dx);
+        const midx = (from.x + to.x) / 2;
+        const midy = (from.y + to.y) / 2;
+        const rect = game22.spriteRects.straight;
+        const tileH = 60;
+        ctx.save();
+        ctx.translate(midx, midy);
+        ctx.rotate(ang);
+        try {
+            ctx.drawImage(game22.sprite, rect.x, rect.y, rect.w, rect.h, -len / 2, -tileH / 2, len, tileH);
+        } catch (e) {
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.strokeStyle = '#16343f';
+            ctx.lineWidth = 14;
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.moveTo(junction.x, junction.y);
+        ctx.lineTo(rx, ry);
+        ctx.strokeStyle = jrActive ? '#2b6b85' : '#444';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+    } else {
+        ctx.beginPath();
+        ctx.moveTo(junction.x, junction.y);
+        ctx.lineTo(rx, ry);
+        ctx.strokeStyle = '#16343f';
+        ctx.lineWidth = 14;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(junction.x, junction.y);
+        ctx.lineTo(rx, ry);
+        ctx.strokeStyle = jrActive ? '#2b6b85' : '#444';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+    }
+
+    ctx.restore();
 }
 
 function drawTap22(ctx, x, y, label, open) {
@@ -275,7 +482,8 @@ function drawReservoir22(ctx) {
     const waterHeight = h * level;
 
     ctx.fillStyle = "#1e90ffaa";
-    ctx.fillRect(x + 2, y + h - waterHeight + 2, w - 4, waterHeight - 4);
+    const drawH = Math.max(0, waterHeight - 4);
+    ctx.fillRect(x + 2, y + h - drawH + 2, w - 4, drawH);
 
     // Texte
     ctx.fillStyle = "#ffffff";
