@@ -3,15 +3,16 @@ let game17 = {};
 
 export function startGame19(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family: 'VT323', monospace; color: white; background: #050509; padding: 20px; border-radius: 15px;">
-            
+        <div style="text-align:center; font-family: 'VT323', monospace; color: white; padding: 20px; border-radius: 15px;">
             <div style="font-size: 1.1em; margin-bottom: 8px;">
                 🔦 Miroirs placés : <span id="mirrors17" style="color:#00e5ff;">0</span> / 3
             </div>
 
-            <canvas id="laserCanvas" width="520" height="380"
-                style="border:4px solid #ff3860; border-radius:8px; box-shadow:0 0 25px #ff3860aa; cursor:crosshair;">
-            </canvas>
+            <div style="display:inline-block; background:#050509; padding:12px; border-radius:12px;">
+                <canvas id="laserCanvas" width="520" height="380"
+                    style="display:block; border:4px solid #ff3860; border-radius:8px; box-shadow:0 0 25px #ff3860aa; cursor:crosshair;">
+                </canvas>
+            </div>
 
             <div style="margin-top:10px;">
                 <button id="fire17" style="padding:6px 16px; border-radius:6px; border:none; background:#00e5ff; color:#050509; font-size:1em; cursor:pointer;">
@@ -39,6 +40,7 @@ export function startGame19(container, onFinish) {
         mirrors: [],
         maxMirrors: 3,
         path: [],
+        animating: false,
 
         // Laser déplacé pour rendre le puzzle intéressant
         laserStart: { x: 60, y: 80 },
@@ -73,6 +75,7 @@ export function startGame19(container, onFinish) {
 function resetGame17() {
     game17.mirrors = [];
     game17.path = [];
+    if (game17.animating) game17.animating = false;
     document.getElementById("mirrors17").textContent = 0;
     document.getElementById("msg17").textContent =
         "Place jusqu'à 3 miroirs, puis lance le laser.";
@@ -107,8 +110,90 @@ function onCanvasClick17(e) {
 /* ------------------ FIRE ------------------ */
 
 function fireLaser17() {
-    simulateLaser17();
-    renderLaserGame17();
+    if (game17.animating) return;
+    game17.animating = true;
+    game17.path = [{ x: game17.laserStart.x, y: game17.laserStart.y }];
+
+    let pos = { x: game17.laserStart.x, y: game17.laserStart.y };
+    let dir = { x: game17.laserDir.x, y: game17.laserDir.y };
+
+    const step = 6;
+    const maxSteps = 4000;
+    let steps = 0;
+
+    function frame() {
+        if (!game17.animating) return;
+
+        const next = { x: pos.x + dir.x * step, y: pos.y + dir.y * step };
+
+        // Sortie écran
+        if (next.x < 0 || next.x > game17.canvas.width || next.y < 0 || next.y > game17.canvas.height) {
+            document.getElementById("msg17").textContent = "Le laser est sorti de l'écran. Recommence...";
+            game17.animating = false;
+            renderLaserGame17();
+            // relancer automatiquement après un court délai
+            setTimeout(() => {
+                resetGame17();
+            }, 700);
+            return;
+        }
+
+        // Cible
+        const d = distance17(next, { x: game17.target.x, y: game17.target.y });
+        if (d <= game17.target.rInnerRed) {
+            game17.animating = false;
+            resetGame17();
+            document.getElementById("msg17").textContent = "❌ Tu as touché le centre rouge ! Recommence.";
+            return;
+        }
+        if (d > game17.target.rWhiteInner && d <= game17.target.rWhiteOuter) {
+            game17.path.push(next);
+            game17.animating = false;
+            document.getElementById("msg17").textContent = "🎉 Tu as touché la couronne blanche !";
+            renderLaserGame17();
+            setTimeout(() => game17.onFinish && game17.onFinish(), 1500);
+            return;
+        }
+
+        // Miroir ? — détecte collision sur le segment courant
+        const hit = findMirrorHit17(pos, next);
+        if (hit) {
+            const hitPoint = hit.point;
+            game17.path.push(hitPoint);
+
+            const mx = hit.mirror.x2 - hit.mirror.x1;
+            const my = hit.mirror.y2 - hit.mirror.y1;
+            const tangent = normalize17({ x: mx, y: my });
+            const normal = { x: -tangent.y, y: tangent.x };
+
+            const dot = dir.x * normal.x + dir.y * normal.y;
+            dir = {
+                x: dir.x - 2 * dot * normal.x,
+                y: dir.y - 2 * dot * normal.y
+            };
+            dir = normalize17(dir);
+            // move a tiny bit along new direction to avoid immediate re-collision
+            pos = { x: hitPoint.x + dir.x * 0.5, y: hitPoint.y + dir.y * 0.5 };
+            renderLaserGame17();
+            requestAnimationFrame(frame);
+            return;
+        }
+
+        pos = next;
+        game17.path.push({ x: pos.x, y: pos.y });
+        steps++;
+        if (steps > maxSteps) {
+            document.getElementById("msg17").textContent = "Le laser s'est dissipé.";
+            game17.animating = false;
+            renderLaserGame17();
+            return;
+        }
+
+        renderLaserGame17();
+        requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
 }
 
 /* ------------------ MIRRORS ------------------ */
@@ -159,8 +244,6 @@ function simulateLaser17() {
 
     const step = 3;
     const maxSteps = 4000;
-    const maxBounces = 12;
-    let bounces = 0;
 
     game17.path.push({ x: pos.x, y: pos.y });
 
@@ -169,7 +252,11 @@ function simulateLaser17() {
 
         // Sortie écran
         if (next.x < 0 || next.x > game17.canvas.width || next.y < 0 || next.y > game17.canvas.height) {
-            document.getElementById("msg17").textContent = "Le laser est sorti de l'écran.";
+            document.getElementById("msg17").textContent = "Le laser est sorti de l'écran. Recommence...";
+            // relancer automatiquement après un court délai
+            setTimeout(() => {
+                resetGame17();
+            }, 700);
             return;
         }
 
@@ -208,13 +295,8 @@ function simulateLaser17() {
                 y: dir.y - 2 * dot * normal.y
             };
             dir = normalize17(dir);
-
-            pos = { x: hitPoint.x, y: hitPoint.y };
-            bounces++;
-            if (bounces > maxBounces) {
-                document.getElementById("msg17").textContent = "Trop de rebonds, le laser s'épuise.";
-                return;
-            }
+            // move a tiny bit along new direction to avoid immediate re-collision
+            pos = { x: hitPoint.x + dir.x * 0.5, y: hitPoint.y + dir.y * 0.5 };
             continue;
         }
 
@@ -231,8 +313,7 @@ function renderLaserGame17() {
     const ctx = game17.ctx;
     const { width, height } = game17.canvas;
 
-    ctx.fillStyle = "#050509";
-    ctx.fillRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
 
     // Grille
     ctx.strokeStyle = "#111320";
@@ -285,6 +366,19 @@ function renderLaserGame17() {
         }
         ctx.stroke();
         ctx.shadowBlur = 0;
+    }
+
+    // Laser head (bright)
+    if (game17.path.length > 0) {
+        const last = game17.path[game17.path.length - 1];
+        ctx.save();
+        ctx.fillStyle = "#ff9df8";
+        ctx.shadowColor = "#ff9df8";
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
     }
 
     // Point de départ
@@ -363,4 +457,20 @@ function segmentIntersection17(p1, p2, p3, p4) {
         };
     }
     return null;
+}
+
+function findMirrorHit17(p1, p2) {
+    let nearest = null;
+    let minDist = Infinity;
+    for (const m of game17.mirrors) {
+        const hit = segmentIntersection17(p1, p2, { x: m.x1, y: m.y1 }, { x: m.x2, y: m.y2 });
+        if (hit) {
+            const d = distance17(p1, hit);
+            if (d < minDist) {
+                minDist = d;
+                nearest = { mirror: m, point: hit };
+            }
+        }
+    }
+    return nearest;
 }
