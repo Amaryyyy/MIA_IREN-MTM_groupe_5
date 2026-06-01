@@ -210,7 +210,7 @@ function isGridMoreThanHalfFull20() {
         }
     }
 
-    return filled > total * 0.5;
+    return filled > total * 0.65;
 }
 
 function hasIrrecoverableHole20() {
