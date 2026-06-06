@@ -17,6 +17,7 @@ export function startGame20(container, onFinish) {
         ">
             
             <div style="font-size:1.2em; margin-bottom:10px;">
+                🎯 Fléchettes : <span id="darts20" style="color:#00e5ff;">0</span> / 5  
                 | Score : <span id="score20" style="color:#ffd34f;">0</span>
             </div>
 
