@@ -1,5 +1,4 @@
 // Level management module
-
 const levels = [
 //1
   { game: 'game1', difficulty: 'easy', title: 'Reverse Maze'},
@@ -40,6 +39,9 @@ const levels = [
 //13
   { game: 'game15', difficulty: 'hard', title: 'Fast Cars' },
 
+// Transition Medium
+  { game: 'TransitionMedium', difficulty: 'medium', title: 'Transition Medium'},
+
 //14
   { game: 'game4', difficulty: 'medium', title: 'Mysterious Enigma'},
 
@@ -78,6 +80,9 @@ const levels = [
   
 //26
   { game: 'game32', difficulty: 'hard', title: 'Silent Break' },
+
+// Transition Hard
+  { game: 'transitionHard', difficulty: 'hard', title: 'Transition Hard'},
 
 //27
   { game: 'game3', difficulty: 'easy', title: 'Invisible Maze'}, 
@@ -120,6 +125,10 @@ const levels = [
 
 //40
   { game: 'game11', difficulty: 'hard', title: 'Digital Dawn' },
+
+// Page fin du jeu
+  { game: 'transitionEnd', difficulty: 'end', title: 'Fin du Jeu'},
+
 ];
 
 // Get the next level
