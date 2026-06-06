@@ -1,9 +1,16 @@
 {
   "builds": [
-    { "src": "Mini_jeux/**", "use": "@vercel/static" }
+    {
+      "src": "Mini_jeux/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
   ],
   "routes": [
-    { "src": "^/$", "dest": "/Mini_jeux/index.html" },
-    { "src": "^/(.*)", "dest": "/Mini_jeux/$1" }
+    { "src": "^/$", "dest": "/Mini_jeux/dist/index.html" },
+    { "src": "^/assets/(.*)", "dest": "/Mini_jeux/dist/assets/$1" },
+    { "src": "^/(.*)", "dest": "/Mini_jeux/dist/$1" }
   ]
 }

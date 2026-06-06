@@ -1,0 +1,76 @@
+export function createGameTitle(text: string): HTMLHeadingElement {
+  const title = document.createElement("h2");
+  title.textContent = text;
+  title.style.textAlign = "center";
+  title.style.color = "#4CAF50";
+  title.style.fontSize = "28px";
+  title.style.marginBottom = "20px";
+  return title;
+}
+
+export function createRebusDisplay(rebus: string): HTMLDivElement {
+  const rebusDiv = document.createElement("div");
+  rebusDiv.style.fontSize = "80px";
+  rebusDiv.style.margin = "20px auto";
+  rebusDiv.style.textAlign = "center";
+  rebusDiv.textContent = rebus;
+  return rebusDiv;
+}
+
+export function createInputField(): HTMLInputElement {
+  const input = document.createElement("input");
+
+  input.placeholder = "Tape ta réponse...";
+  input.style.margin = "10px auto";
+  input.style.display = "block";
+  input.style.fontSize = "18px";
+  input.style.padding = "10px";
+  input.style.width = "60%";
+  input.style.backgroundColor = "#1E1B4B";
+  input.style.color = "white";
+  input.style.border = "2px solid #8B5CF6";
+  input.style.borderRadius = "10px";
+  input.style.boxShadow = `
+    0 0 5px #8B5CF6,
+    0 0 15px #7C3AED,
+    0 0 25px rgba(124, 58, 237, 0.6)
+  `;
+
+  return input;
+}
+
+export function createValidationButton(): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.textContent = "Valider";
+  button.style.margin = "10px auto";
+  button.style.display = "block";
+  button.style.fontSize = "14px";
+  button.style.padding = "8px 16px";
+  return button;
+}
+
+export function createFeedbackDiv(): HTMLDivElement {
+  const feedbackDiv = document.createElement("div");
+  feedbackDiv.style.textAlign = "center";
+  feedbackDiv.style.marginTop = "20px";
+  return feedbackDiv;
+}
+
+export const errorMessages = [
+  "✗ Essaie encore",
+  "✗ Tu peux y arriver, j'ai confiance !",
+  "✗ Oh.. il va falloir réfléchir un peu plus",
+  "✗ Tu t'es endormi ?",
+  "✗ Ça commence à être inquiétant...",
+  "✗ Allez, un dernier effort !",
+  "✗ Tu veux un indice ?",
+] as const;
+
+export function setFeedback(
+  feedbackDiv: HTMLElement,
+  isSuccess: boolean,
+  message: string
+) {
+  feedbackDiv.style.color = isSuccess ? "lime" : "red";
+  feedbackDiv.textContent = message;
+}
