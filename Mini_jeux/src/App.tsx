@@ -1,25 +1,41 @@
 import { useCallback, useEffect, useState } from "react";
+import AuthModal from "@/components/auth/AuthModal";
+import ProfileSetupModal from "@/components/auth/ProfileSetupModal";
 import BackgroundLayers from "@/components/BackgroundLayers";
 import FloatingIcons from "@/components/FloatingIcons";
 import HomeScreen from "@/components/HomeScreen";
+import LeaderboardModal from "@/components/LeaderboardModal";
 import PlayArea from "@/components/PlayArea";
 import SideDecorations from "@/components/SideDecorations";
 import StarRainLayer from "@/components/StarRainLayer";
+import { useAuth } from "@/contexts/AuthContext";
 import { getAllLevels } from "@/lib/loadGame";
 import type { AppScreen, StarBurst } from "@/types/game";
 
 export default function App() {
   const levels = getAllLevels();
+  const {
+    user,
+    profile,
+    progressLevel,
+    needsProfileSetup,
+    recordLevelCompletion,
+  } = useAuth();
+
   const [screen, setScreen] = useState<AppScreen>("home");
   const [currentLevel, setCurrentLevel] = useState(0);
   const [starBursts, setStarBursts] = useState<StarBurst[]>([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const inGame = screen === "play";
+  const canSave = Boolean(user && profile);
+  const resumeLevel = canSave ? progressLevel : null;
 
   const startGameFlow = useCallback(() => {
-    setCurrentLevel(0);
+    setCurrentLevel(canSave ? progressLevel : 0);
     setScreen("play");
-  }, []);
+  }, [canSave, progressLevel]);
 
   const nextLevel = useCallback(() => {
     setCurrentLevel((prev) => Math.min(prev + 1, levels.length));
@@ -60,15 +76,27 @@ export default function App() {
     <>
       <BackgroundLayers />
       <SideDecorations hidden={inGame} onImageClick={triggerStarRain} />
-      {screen === "home" && <HomeScreen onStart={startGameFlow} />}
+
+      {screen === "home" && (
+        <HomeScreen
+          onStart={startGameFlow}
+          onLoginClick={() => setShowAuthModal(true)}
+          onLeaderboardClick={() => setShowLeaderboard(true)}
+          resumeLevel={resumeLevel}
+        />
+      )}
+
       {screen === "play" && (
         <PlayArea
           currentLevel={currentLevel}
           onNext={nextLevel}
           onPrevious={previousLevel}
+          onLevelComplete={canSave ? recordLevelCompletion : undefined}
         />
       )}
+
       <FloatingIcons />
+
       {starBursts.map((burst) => (
         <StarRainLayer
           key={burst.id}
@@ -77,6 +105,16 @@ export default function App() {
           onComplete={() => removeStarBurst(burst.id)}
         />
       ))}
+
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
+
+      {needsProfileSetup && <ProfileSetupModal />}
+
+      {showLeaderboard && (
+        <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
+      )}
     </>
   );
 }
