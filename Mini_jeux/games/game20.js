@@ -1,6 +1,6 @@
 import { gameManager } from "../gameCleanup.js";
 
-let game18 = {};
+let game20 = {};
 
 export function startGame20(container, onFinish) {
     container.innerHTML = `
@@ -17,8 +17,7 @@ export function startGame20(container, onFinish) {
         ">
             
             <div style="font-size:1.2em; margin-bottom:10px;">
-                🎯 Fléchettes : <span id="darts18" style="color:#00e5ff;">0</span> / 5  
-                | Score : <span id="score18" style="color:#ffd34f;">0</span>
+                | Score : <span id="score20" style="color:#ffd34f;">0</span>
             </div>
 
             <canvas id="dartCanvas" width="520" height="380"
@@ -32,7 +31,7 @@ export function startGame20(container, onFinish) {
             </canvas>
 
             <div style="margin-top:10px;">
-                <button id="reset18" style="
+                <button id="reset20" style="
                     padding:6px 16px;
                     border-radius:6px;
                     border:none;
@@ -45,7 +44,7 @@ export function startGame20(container, onFinish) {
                 </button>
             </div>
 
-            <p id="msg18" style="margin-top:10px; min-height:24px; font-size:1.1em;">
+            <p id="msg20" style="margin-top:10px; min-height:24px; font-size:1.1em;">
                 Tu dois finir avec **5 points** pour gagner.
             </p>
         </div>
@@ -54,7 +53,7 @@ export function startGame20(container, onFinish) {
     const canvas = container.querySelector("#dartCanvas");
     const ctx = canvas.getContext("2d");
 
-    game18 = {
+    game20 = {
         ctx,
         canvas,
         onFinish,
@@ -75,66 +74,66 @@ export function startGame20(container, onFinish) {
         }
     };
 
-    canvas.addEventListener("click", throwDart18);
-    container.querySelector("#reset18").addEventListener("click", resetGame18);
+    canvas.addEventListener("click", throwDart20);
+    container.querySelector("#reset20").addEventListener("click", resetGame20);
 
-    renderDartGame18();
+    renderDartGame20();
 }
 
 /* ------------------ RESET ------------------ */
 
-function resetGame18() {
-    game18.darts = [];
-    game18.dartsThrown = 0;
-    game18.score = 0;
+function resetGame20() {
+    game20.darts = [];
+    game20.dartsThrown = 0;
+    game20.score = 0;
 
-    document.getElementById("darts18").textContent = 0;
-    document.getElementById("score18").textContent = 0;
+    document.getElementById("darts20").textContent = 0;
+    document.getElementById("score20").textContent = 0;
 
-    document.getElementById("msg18").textContent =
+    document.getElementById("msg20").textContent =
         "+1 si tu rates, -1 si tu touches. Tu dois finir avec 5 points.";
 
-    renderDartGame18();
+    renderDartGame20();
 }
 
 /* ------------------ THROW ------------------ */
 
-function throwDart18(e) {
-    if (game18.dartsThrown >= game18.maxDarts) return;
+function throwDart20(e) {
+    if (game20.dartsThrown >= game20.maxDarts) return;
 
-    const rect = game18.canvas.getBoundingClientRect();
+    const rect = game20.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    const dx = mx - game18.throwPos.x;
-    const dy = my - game18.throwPos.y;
+    const dx = mx - game20.throwPos.x;
+    const dy = my - game20.throwPos.y;
 
     const angle = Math.atan2(dy, dx);
     const power = Math.min(12, Math.hypot(dx, dy) / 20);
 
-    game18.darts.push({
-        x: game18.throwPos.x,
-        y: game18.throwPos.y,
+    game20.darts.push({
+        x: game20.throwPos.x,
+        y: game20.throwPos.y,
         vx: Math.cos(angle) * power,
         vy: Math.sin(angle) * power,
         scored: false,
         stopped: false
     });
 
-    game18.dartsThrown++;
-    document.getElementById("darts18").textContent = game18.dartsThrown;
+    game20.dartsThrown++;
+    document.getElementById("darts20").textContent = game20.dartsThrown;
 
-    animateDarts18();
+    animateDarts20();
 }
 
 /* ------------------ ANIMATION ------------------ */
 
-function animateDarts18() {
+function animateDarts20() {
     function frame() {
-        updateDarts18();
-        renderDartGame18();
+        updateDarts20();
+        renderDartGame20();
 
-        if (checkEnd18()) return;
+        if (checkEnd20()) return;
 
         requestAnimationFrame(frame);
     }
@@ -143,16 +142,16 @@ function animateDarts18() {
 
 /* ------------------ UPDATE ------------------ */
 
-function updateDarts18() {
-    for (const d of game18.darts) {
+function updateDarts20() {
+    for (const d of game20.darts) {
         if (d.stopped) continue;
 
-        d.vy += game18.gravity;
+        d.vy += game20.gravity;
         d.x += d.vx;
         d.y += d.vy;
 
         // Stop si touche le sol
-        if (d.y >= game18.canvas.height - 10) {
+        if (d.y >= game20.canvas.height - 10) {
             d.stopped = true;
         }
     }
@@ -160,10 +159,10 @@ function updateDarts18() {
 
 /* ------------------ SCORING + COLLISIONS ------------------ */
 
-function checkEnd18() {
-    const t = game18.target;
+function checkEnd20() {
+    const t = game20.target;
 
-    for (const d of game18.darts) {
+    for (const d of game20.darts) {
 
         if (d.scored) continue;
 
@@ -175,21 +174,21 @@ function checkEnd18() {
 
         // Centre rouge → reset immédiat
         if (dist <= t.rRed) {
-            game18.score -= 1;
-            document.getElementById("score18").textContent = game18.score;
+            game20.score -= 1;
+            document.getElementById("score20").textContent = game20.score;
 
-            resetGame18();
-            document.getElementById("msg18").textContent =
+            resetGame20();
+            document.getElementById("msg20").textContent =
                 "❌ Centre rouge ! -1 point. Recommence.";
             return true;
         }
 
         // Touche la cible (bleu, blanc, rouge)
         if (dist <= t.rBlue) {
-            game18.score -= 1;
+            game20.score -= 1;
             d.scored = true;
             d.stopped = true;
-            document.getElementById("score18").textContent = game18.score;
+            document.getElementById("score20").textContent = game20.score;
             continue;
         }
 
@@ -198,9 +197,9 @@ function checkEnd18() {
         -------------------------- */
 
         if (d.stopped && !d.scored) {
-            game18.score += 1;
+            game20.score += 1;
             d.scored = true;
-            document.getElementById("score18").textContent = game18.score;
+            document.getElementById("score20").textContent = game20.score;
         }
     }
 
@@ -208,17 +207,17 @@ function checkEnd18() {
        🎯 FIN DES 5 FLÉCHETTES
     -------------------------- */
 
-    if (game18.dartsThrown === game18.maxDarts &&
-        game18.darts.every(d => d.scored)) {
+    if (game20.dartsThrown === game20.maxDarts &&
+        game20.darts.every(d => d.scored)) {
 
-        if (game18.score === 5) {
-            document.getElementById("msg18").textContent =
+        if (game20.score === 5) {
+            document.getElementById("msg20").textContent =
                 "🎉 BRAVO ! Tu as obtenu 5 points !";
-            setTimeout(() => game18.onFinish && game18.onFinish(), 1500);
+            setTimeout(() => game20.onFinish && game20.onFinish(), 1500);
         } else {
-            document.getElementById("msg18").textContent =
+            document.getElementById("msg20").textContent =
                 "❌ Tu n'as pas 5 points. Partie perdue !";
-            setTimeout(() => resetGame18(), 1500);
+            setTimeout(() => resetGame20(), 1500);
         }
 
         return true;
@@ -229,18 +228,18 @@ function checkEnd18() {
 
 /* ------------------ RENDER ------------------ */
 
-function renderDartGame18() {
-    const ctx = game18.ctx;
-    const { width, height } = game18.canvas;
+function renderDartGame20() {
+    const ctx = game20.ctx;
+    const { width, height } = game20.canvas;
 
     // Cadran noir ajusté
     ctx.fillStyle = "#050509";
     ctx.fillRect(6, 6, width - 12, height - 12);
 
-    drawTarget18(ctx, game18.target);
+    drawTarget20(ctx, game20.target);
 
     ctx.fillStyle = "#ff3860";
-    for (const d of game18.darts) {
+    for (const d of game20.darts) {
         ctx.beginPath();
         ctx.arc(d.x, d.y, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -248,11 +247,11 @@ function renderDartGame18() {
 
     ctx.fillStyle = "#86eefa";
     ctx.beginPath();
-    ctx.arc(game18.throwPos.x, game18.throwPos.y, 6, 0, Math.PI * 2);
+    ctx.arc(game20.throwPos.x, game20.throwPos.y, 6, 0, Math.PI * 2);
     ctx.fill();
 }
 
-function drawTarget18(ctx, t) {
+function drawTarget20(ctx, t) {
     ctx.fillStyle = "#1b3bff";
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.rBlue, 0, Math.PI * 2);

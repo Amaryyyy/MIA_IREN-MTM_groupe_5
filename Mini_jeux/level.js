@@ -38,88 +38,88 @@ const levels = [
   { game: 'game12', difficulty: 'hard', title: 'Pixel Peril' },
 
 //13
-  { game: 'game13', difficulty: 'hard', title: 'Escape' },
-
-//14
-  { game: 'game14', difficulty: 'hard', title: 'Giant Snake' },
-
-//15
   { game: 'game15', difficulty: 'hard', title: 'Fast Cars' },
 
+//14
+  { game: 'game4', difficulty: 'medium', title: 'Mysterious Enigma'},
+
+//15
+  { game: 'game38', difficulty: 'hard', title: 'Cyber Diavola' },
+  
 //16
-  { game: 'game16', difficulty: 'hard', title: 'Galaxy Seum' },
+  { game: 'game7', difficulty: 'hard', title: 'Polary Memory' },
 
 //17
-  { game: 'game17', difficulty: 'hard', title: 'Prime Stickler' },
+  { game: 'game28', difficulty: 'hard', title: 'TriadCode' },
 
 //18
-  { game: 'game4', difficulty: 'medium', title: 'Mysterious Enigma'},
-  
-//19
-  { game: 'game19', difficulty: 'hard', title: 'Logic Mirrors' },
-
-//20
-  { game: 'game11', difficulty: 'hard', title: 'Digital Dawn' },
-
-//21
   { game: 'game5', difficulty: 'medium', title: 'Strange Symbols'},
   
+//19
+  { game: 'game35', difficulty: 'hard', title: 'Labyrinthe Neural' },
+
+//20
+  { game: 'game39', difficulty: 'hard', title: 'Ice Stack Deluxe' },
+
+//21
+  { game: 'game29', difficulty: 'hard', title: 'LetterPulse' },
+  
 //22
-  { game: 'game22', difficulty: 'hard', title: 'Syntax Siege' },
+  { game: 'game36', difficulty: 'hard', title: 'Pac Trap' },
 
 //23
-  { game: 'game23', difficulty: 'hard', title: 'Compiler Chaos' },
+  { game: 'game33', difficulty: 'hard', title: 'Retro Descent' },
 
 //24
   { game: 'game24', difficulty: 'hard', title: 'Framework Frenzy' },
 
 //25
-  { game: 'game3', difficulty: 'easy', title: 'Invisible Maze'},
+  { game: 'game16', difficulty: 'hard', title: 'Galaxy Seum' },
   
 //26
-  { game: 'game9', difficulty: 'hard', title: 'Matchy Matchy' },
-
-//27
-  { game: 'game27', difficulty: 'hard', title: 'Digit Riddle' },
-
-//28
-  { game: 'game28', difficulty: 'hard', title: 'TriadCode' },
-
-//29
-  { game: 'game29', difficulty: 'hard', title: 'LetterPulse' },
-
-//30
-  { game: 'game30', difficulty: 'hard', title: 'The Unpattern' },
-
-//31
-  { game: 'game7', difficulty: 'hard', title: 'Polary Memory' },
-  
-//32
   { game: 'game32', difficulty: 'hard', title: 'Silent Break' },
 
-//33
-  { game: 'game33', difficulty: 'hard', title: 'Retro Descent' },
+//27
+  { game: 'game3', difficulty: 'easy', title: 'Invisible Maze'}, 
 
-//34
+//28
+  { game: 'game19', difficulty: 'hard', title: 'Logic Mirrors' },
+
+//29
+  { game: 'game27', difficulty: 'hard', title: 'Digit Riddle' },
+ 
+//30
+  { game: 'game9', difficulty: 'hard', title: 'Matchy Matchy' },
+
+//31
   { game: 'game34', difficulty: 'hard', title: 'End of Reason' },
+  
+//32
+  { game: 'game14', difficulty: 'hard', title: 'Giant Snake' },
+
+//33
+  { game: 'game40', difficulty: 'hard', title: 'Chromix' },
+ 
+//34
+  { game: 'game13', difficulty: 'hard', title: 'Escape' },
 
 //35
-  { game: 'game35', difficulty: 'hard', title: 'Labyrinthe Neural' },
+  { game: 'game23', difficulty: 'hard', title: 'Compiler Chaos' },
 
 //36
-  { game: 'game36', difficulty: 'hard', title: 'Pac Trap' },
+  { game: 'game22', difficulty: 'hard', title: 'Syntax Siege' },
 
 //37
-  { game: 'game37', difficulty: 'hard', title: 'Neo Snake' },
+  { game: 'game17', difficulty: 'hard', title: 'Prime Stickler' },
 
 //38
-  { game: 'game38', difficulty: 'hard', title: 'Cyber Diavola' },
-
+  { game: 'game37', difficulty: 'hard', title: 'Neo Snake' },
+ 
 //39
-  { game: 'game39', difficulty: 'hard', title: 'Ice Stack Deluxe' },
+  { game: 'game30', difficulty: 'hard', title: 'The Unpattern' },
 
 //40
-  { game: 'game40', difficulty: 'hard', title: 'Chromix' },
+  { game: 'game11', difficulty: 'hard', title: 'Digital Dawn' },
 ];
 
 // Get the next level
