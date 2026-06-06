@@ -8,11 +8,20 @@ export function startGame19(container, onFinish) {
                 🔦 Miroirs placés : <span id="mirrors17" style="color:#00e5ff;">0</span> / 3
             </div>
 
-            <div style="display:inline-block; background:#050509; padding:12px; border-radius:12px;">
-                <canvas id="laserCanvas" width="520" height="380"
-                    style="display:block; border:4px solid #ff3860; border-radius:8px; box-shadow:0 0 25px #ff3860aa; cursor:crosshair;">
-                </canvas>
-            </div>
+       <div style="display:inline-block; padding:0; border-radius:12px;">
+    <<div style="
+    display:inline-block;
+    background:#050509;
+    padding:0;
+    border-radius:12px;
+    width:fit-content;
+    height:fit-content;
+">
+    <canvas id="laserCanvas" width="520" height="380"
+        style="display:block; border:4px solid #ff3860; border-radius:12px; box-shadow:0 0 25px #ff3860aa; cursor:crosshair;">
+    </canvas>
+</div>
+
 
             <div style="margin-top:10px;">
                 <button id="fire17" style="padding:6px 16px; border-radius:6px; border:none; background:#00e5ff; color:#050509; font-size:1em; cursor:pointer;">

@@ -1,26 +1,52 @@
 import { gameManager } from "../gameCleanup.js";
+
 let game18 = {};
 
 export function startGame20(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#050509; padding:20px; border-radius:15px;">
+        <div style="
+            display:inline-block;
+            background:#050509;
+            padding:4px;
+            border-radius:8px;
+            width:fit-content;
+            height:fit-content;
+            text-align:center;
+            font-family:'VT323', monospace;
+            color:white;
+        ">
             
             <div style="font-size:1.2em; margin-bottom:10px;">
-                🎯 Fléchettes lancées : <span id="darts18" style="color:#00e5ff;">0</span> / 5
+                🎯 Fléchettes : <span id="darts18" style="color:#00e5ff;">0</span> / 5  
+                | Score : <span id="score18" style="color:#ffd34f;">0</span>
             </div>
 
             <canvas id="dartCanvas" width="520" height="380"
-                style="border:4px solid #ff3860; border-radius:8px; box-shadow:0 0 25px #ff3860aa; cursor:crosshair;">
+                style="
+                    display:block;
+                    border:4px solid #ff3860;
+                    border-radius:8px;
+                    box-shadow:0 0 25px #ff3860aa;
+                    cursor:crosshair;
+                ">
             </canvas>
 
             <div style="margin-top:10px;">
-                <button id="reset18" style="padding:6px 16px; border-radius:6px; border:none; background:#ff3860; color:#fff; font-size:1em; cursor:pointer;">
+                <button id="reset18" style="
+                    padding:6px 16px;
+                    border-radius:6px;
+                    border:none;
+                    background:#ff3860;
+                    color:#fff;
+                    font-size:1em;
+                    cursor:pointer;
+                ">
                     Recommencer
                 </button>
             </div>
 
             <p id="msg18" style="margin-top:10px; min-height:24px; font-size:1.1em;">
-                Clique pour lancer une fléchette. Vise la zone blanche, évite le centre rouge.
+                Tu dois finir avec **5 points** pour gagner.
             </p>
         </div>
     `;
@@ -36,11 +62,10 @@ export function startGame20(container, onFinish) {
         maxDarts: 5,
         darts: [],
         gravity: 0.25,
+        score: 0,
 
-        // Position de tir
         throwPos: { x: 80, y: 300 },
 
-        // Cible
         target: {
             x: 420,
             y: 180,
@@ -61,9 +86,14 @@ export function startGame20(container, onFinish) {
 function resetGame18() {
     game18.darts = [];
     game18.dartsThrown = 0;
+    game18.score = 0;
+
     document.getElementById("darts18").textContent = 0;
+    document.getElementById("score18").textContent = 0;
+
     document.getElementById("msg18").textContent =
-        "Clique pour lancer une fléchette. Vise la zone blanche, évite le centre rouge.";
+        "+1 si tu rates, -1 si tu touches. Tu dois finir avec 5 points.";
+
     renderDartGame18();
 }
 
@@ -76,7 +106,6 @@ function throwDart18(e) {
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    // Calcul direction
     const dx = mx - game18.throwPos.x;
     const dy = my - game18.throwPos.y;
 
@@ -87,7 +116,9 @@ function throwDart18(e) {
         x: game18.throwPos.x,
         y: game18.throwPos.y,
         vx: Math.cos(angle) * power,
-        vy: Math.sin(angle) * power
+        vy: Math.sin(angle) * power,
+        scored: false,
+        stopped: false
     });
 
     game18.dartsThrown++;
@@ -99,8 +130,6 @@ function throwDart18(e) {
 /* ------------------ ANIMATION ------------------ */
 
 function animateDarts18() {
-    const ctx = game18.ctx;
-
     function frame() {
         updateDarts18();
         renderDartGame18();
@@ -109,7 +138,6 @@ function animateDarts18() {
 
         requestAnimationFrame(frame);
     }
-
     frame();
 }
 
@@ -117,53 +145,80 @@ function animateDarts18() {
 
 function updateDarts18() {
     for (const d of game18.darts) {
+        if (d.stopped) continue;
+
         d.vy += game18.gravity;
         d.x += d.vx;
         d.y += d.vy;
+
+        // Stop si touche le sol
+        if (d.y >= game18.canvas.height - 10) {
+            d.stopped = true;
+        }
     }
 }
 
-/* ------------------ COLLISIONS ------------------ */
+/* ------------------ SCORING + COLLISIONS ------------------ */
 
 function checkEnd18() {
     const t = game18.target;
 
     for (const d of game18.darts) {
+
+        if (d.scored) continue;
+
         const dist = Math.hypot(d.x - t.x, d.y - t.y);
 
-        // ❌ Centre rouge → reset immédiat
+        /* -------------------------
+           🎯 COLLISION IMMÉDIATE
+        -------------------------- */
+
+        // Centre rouge → reset immédiat
         if (dist <= t.rRed) {
+            game18.score -= 1;
+            document.getElementById("score18").textContent = game18.score;
+
             resetGame18();
             document.getElementById("msg18").textContent =
-                "❌ Une fléchette a touché le centre rouge ! Recommence.";
+                "❌ Centre rouge ! -1 point. Recommence.";
             return true;
         }
 
-        // ❌ En dehors de la zone blanche → échec
-        if (dist > t.rWhite && dist < t.rBlue) {
-            resetGame18();
-            document.getElementById("msg18").textContent =
-                "❌ Une fléchette n'est pas dans la zone blanche.";
-            return true;
+        // Touche la cible (bleu, blanc, rouge)
+        if (dist <= t.rBlue) {
+            game18.score -= 1;
+            d.scored = true;
+            d.stopped = true;
+            document.getElementById("score18").textContent = game18.score;
+            continue;
+        }
+
+        /* -------------------------
+           🎯 RATE LA CIBLE
+        -------------------------- */
+
+        if (d.stopped && !d.scored) {
+            game18.score += 1;
+            d.scored = true;
+            document.getElementById("score18").textContent = game18.score;
         }
     }
 
-    // 🎉 Victoire si 5 fléchettes dans la zone blanche
-    if (game18.dartsThrown === game18.maxDarts) {
-        let allGood = true;
-        for (const d of game18.darts) {
-            const dist = Math.hypot(d.x - t.x, d.y - t.y);
-            if (!(dist > t.rRed && dist <= t.rWhite)) allGood = false;
-        }
+    /* -------------------------
+       🎯 FIN DES 5 FLÉCHETTES
+    -------------------------- */
 
-        if (allGood) {
+    if (game18.dartsThrown === game18.maxDarts &&
+        game18.darts.every(d => d.scored)) {
+
+        if (game18.score === 5) {
             document.getElementById("msg18").textContent =
-                "🎉 Bravo ! Les 5 fléchettes sont dans la zone blanche !";
+                "🎉 BRAVO ! Tu as obtenu 5 points !";
             setTimeout(() => game18.onFinish && game18.onFinish(), 1500);
         } else {
-            resetGame18();
             document.getElementById("msg18").textContent =
-                "❌ Toutes les fléchettes doivent être dans la zone blanche.";
+                "❌ Tu n'as pas 5 points. Partie perdue !";
+            setTimeout(() => resetGame18(), 1500);
         }
 
         return true;
@@ -178,12 +233,12 @@ function renderDartGame18() {
     const ctx = game18.ctx;
     const { width, height } = game18.canvas;
 
+    // Cadran noir ajusté
     ctx.fillStyle = "#050509";
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(6, 6, width - 12, height - 12);
 
     drawTarget18(ctx, game18.target);
 
-    // Fléchettes
     ctx.fillStyle = "#ff3860";
     for (const d of game18.darts) {
         ctx.beginPath();
@@ -191,7 +246,6 @@ function renderDartGame18() {
         ctx.fill();
     }
 
-    // Position de tir
     ctx.fillStyle = "#86eefa";
     ctx.beginPath();
     ctx.arc(game18.throwPos.x, game18.throwPos.y, 6, 0, Math.PI * 2);
@@ -199,28 +253,18 @@ function renderDartGame18() {
 }
 
 function drawTarget18(ctx, t) {
-    // Bleu extérieur
     ctx.fillStyle = "#1b3bff";
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.rBlue, 0, Math.PI * 2);
     ctx.fill();
 
-    // Blanc (objectif)
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.rWhite, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rouge interdit
     ctx.fillStyle = "#ff3860";
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.rRed, 0, Math.PI * 2);
     ctx.fill();
-}
-
-/* ------------------ UTILS ------------------ */
-
-function normalize17(v) {
-    const len = Math.hypot(v.x, v.y);
-    return len === 0 ? { x: 0, y: 0 } : { x: v.x / len, y: v.y / len };
 }

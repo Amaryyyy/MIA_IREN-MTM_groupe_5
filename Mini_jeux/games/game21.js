@@ -4,13 +4,19 @@ let game19 = {};
 
 export function startGame21(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white; background:#050509; padding:20px; border-radius:15px;">
+        <div style="text-align:center; font-family:'VT323', monospace; color:white;">
             <h2 style="margin:0 0 10px;">🐜 Tour des Fourmis — Version inversée</h2>
             <p style="margin:0 0 10px;">Objectif : <br>
             <span style="color:#afff9f;">Empiler les fourmis avec la plus petite en bas → la plus grande en haut</span></p>
 
             <canvas id="hanoiCanvas19" width="520" height="300"
-                style="border:4px solid #ff3860; border-radius:8px; box-shadow:0 0 25px #ff3860aa; cursor:pointer;">
+                style="
+                    border:4px solid #ff3860;
+                    border-radius:8px;
+                    box-shadow:0 0 25px #ff3860aa;
+                    cursor:pointer;
+                    background:#050509;
+                ">
             </canvas>
 
             <p id="msg19" style="margin-top:10px; min-height:24px; font-size:1.1em;">
@@ -29,8 +35,9 @@ export function startGame21(container, onFinish) {
         selected: null,
 
         // 1 = petite fourmi, 4 = grosse
+        // 👉 On commence avec la plus petite en bas → la plus grande en haut
         piles: [
-            [4, 3, 2, 1], // On commence avec la plus grande en bas
+            [1, 2, 3, 4],
             [],
             []
         ],
@@ -75,7 +82,7 @@ function moveHanoi19(from, to) {
     const ant = pileFrom[pileFrom.length - 1];
 
     // RÈGLE INVERSÉE :
-    // On ne peut poser qu'une fourmi PLUS GRANDE sur une PLUS PETITE
+    // 👉 On ne peut poser qu'une fourmi PLUS GRANDE sur une PLUS PETITE
     if (pileTo.length > 0 && pileTo[pileTo.length - 1] < ant) {
         document.getElementById("msg19").textContent =
             "❌ Une petite fourmi ne peut pas porter une grosse !";
@@ -91,12 +98,13 @@ function moveHanoi19(from, to) {
 /* ------------------ WIN ------------------ */
 
 function checkWinHanoi19() {
-    const target = [4, 3, 2, 1]; // 1 en bas, 4 en haut
+    // 👉 Condition de victoire : la plus petite en bas → la plus grande en haut
+    const target = [1, 2, 3, 4];
 
     for (const pile of game19.piles) {
         if (pile.length === 4 && JSON.stringify(pile) === JSON.stringify(target)) {
             document.getElementById("msg19").textContent =
-                "🎉 Bravo ! Tu as empilé les fourmis dans le bon ordre inversé !";
+                "🎉 Bravo ! La plus petite est bien en bas, et la plus grande en haut !";
             setTimeout(() => game19.onFinish && game19.onFinish(), 1500);
         }
     }
@@ -108,6 +116,7 @@ function renderHanoi19() {
     const ctx = game19.ctx;
     const { width, height } = game19.canvas;
 
+    // Fond noir du canvas
     ctx.fillStyle = "#050509";
     ctx.fillRect(0, 0, width, height);
 
