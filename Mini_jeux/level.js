@@ -82,7 +82,7 @@ const levels = [
   { game: 'game32', difficulty: 'hard', title: 'Silent Break' },
 
 // Transition Hard
-  { game: 'transitionHard', difficulty: 'hard', title: 'Transition Hard'},
+  { game: 'TransitionHard', difficulty: 'hard', title: 'Transition Hard'},
 
 //27
   { game: 'game3', difficulty: 'easy', title: 'Invisible Maze'}, 
@@ -127,7 +127,7 @@ const levels = [
   { game: 'game11', difficulty: 'hard', title: 'Digital Dawn' },
 
 // Page fin du jeu
-  { game: 'transitionEnd', difficulty: 'end', title: 'Fin du Jeu'},
+  { game: 'TransitionEnd', difficulty: 'end', title: 'Fin du Jeu'},
 
 ];
 
