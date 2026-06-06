@@ -14,29 +14,28 @@ const levels = [
   { game: 'game6', difficulty: 'hard', title: 'Loop Rebus' }, 
   
 //5
-  { game: 'game10', difficulty: 'hard', title: 'Cyber Nexus' },
-
-
-//6
-  { game: 'game2', difficulty: 'easy', title: 'Color Hack'},
-
-//7
   { game: 'game18', difficulty: 'hard', title: 'Binary Blast' },
 
-//8
+//6
   { game: 'game25', difficulty: 'hard', title: 'API Assault' },
+  
+//7
+  { game: 'game10', difficulty: 'hard', title: 'Cyber Nexus' },
+
+//8
+  { game: 'game2', difficulty: 'easy', title: 'Color Hack'},
 
 //9
-  { game: 'game26', difficulty: 'hard', title: 'Crazy Draft' },
+  { game: 'game20', difficulty: 'hard', title: 'Slot the Darts' },
 
 //10
-  { game: 'game21', difficulty: 'hard', title: 'Debugging Duel' },
+  { game: 'game26', difficulty: 'hard', title: 'Crazy Draft' },
 
 //11
-  { game: 'game12', difficulty: 'hard', title: 'Pixel Peril' },
+  { game: 'game21', difficulty: 'hard', title: 'Debugging Duel' },
 
 //12
-  { game: 'game11', difficulty: 'hard', title: 'Digital Dawn' },
+  { game: 'game12', difficulty: 'hard', title: 'Pixel Peril' },
 
 //13
   { game: 'game13', difficulty: 'hard', title: 'Escape' },
@@ -60,7 +59,7 @@ const levels = [
   { game: 'game19', difficulty: 'hard', title: 'Logic Mirrors' },
 
 //20
-  { game: 'game20', difficulty: 'hard', title: 'Slot the Darts' },
+  { game: 'game11', difficulty: 'hard', title: 'Digital Dawn' },
 
 //21
   { game: 'game5', difficulty: 'medium', title: 'Strange Symbols'},
