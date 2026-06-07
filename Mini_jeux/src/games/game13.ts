@@ -414,7 +414,7 @@ canvas.style.boxShadow = `
 
       exitTimer++;
 
-      if (exitTimer > 10) {
+      if (exitTimer > 20) {
         endGame();
       }
 
@@ -584,9 +584,8 @@ canvas.style.boxShadow = `
   // =========================
 
   function endGame() {
-    running = false;
     gameManager.cleanup();
-    onFinish && onFinish();
+    onFinish?.();
   }
   // =========================
   // START
