@@ -24,7 +24,7 @@ container.innerHTML = `
           font-size:14px;
           color:#ff3860;
        ">
-       La plus petite fourmi doit finir tout en bas.
+       La plus petite fourmi doit être tout en bas.
     </p>
 
     <canvas id="hanoiCanvas19"
