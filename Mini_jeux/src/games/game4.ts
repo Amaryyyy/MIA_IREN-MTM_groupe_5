@@ -24,21 +24,26 @@ export function startGame4(container, onFinish) {
 
   const title = createGameTitle("Déchiffre l'énigme !");
   title.style.fontFamily = "Orbitron, sans-serif";
-  
   title.style.color = "#FFEAF8";
 
   title.style.textShadow = `
     0 0 4px rgba(255,255,255,0.7),
-    0 0 8px rgba(255, 192, 203, 0.95)
+    0 0 8px rgba(255,192,203,0.35)
   `;
+
   const rebusDiv = createRebusDisplay("🐄🪺💧🫏");
 
   rebusDiv.style.fontFamily =
     "Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif";
 
   const input = createInputField();
+  input.style.fontFamily = "Orbitron, sans-serif";
+
   const button = createValidationButton();
+  button.style.fontFamily = "Orbitron, sans-serif";
+
   const feedbackDiv = createFeedbackDiv();
+  feedbackDiv.style.fontFamily = "Orbitron, sans-serif";
 
   container.appendChild(title);
   container.appendChild(rebusDiv);

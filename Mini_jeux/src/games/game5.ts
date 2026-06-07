@@ -37,8 +37,13 @@ export function startGame5(container, onFinish) {
     "Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif";
 
   const input = createInputField();
+  input.style.fontFamily = "Orbitron, sans-serif";
+
   const button = createValidationButton();
+  button.style.fontFamily = "Orbitron, sans-serif";
+
   const feedbackDiv = createFeedbackDiv();
+  feedbackDiv.style.fontFamily = "Orbitron, sans-serif";
 
   container.appendChild(title);
   container.appendChild(rebusDiv);
