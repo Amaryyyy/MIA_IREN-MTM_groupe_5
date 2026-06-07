@@ -9,25 +9,46 @@ let game24 = {};
 
 export function startGame39(container, onFinish) {
    container.innerHTML = `
-       <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:0; border-radius:15px;">
-           <p style="margin:0 0 8px; font-size:0.95em;">
-               Empile les boules de glace sur le cornet.<br>
-               <span style="color:#ffdd99;">La boule dont le parfum commence le plus tôt dans l'alphabet doit être en bas…</span>
-           </p>
+      <div style="
+    text-align:center;
+    font-family:Orbitron,sans-serif;
+    color:white;
+    background:transparent;
+    padding:0;
+    border-radius:15px;
+">
+    <p style="
+        margin:0 0 10px;
+        font-size:13px;
+        color:#f8f8ff;
+        letter-spacing:0.5px;
+    ">
+        Dépose les boules de glace sur le cornet !<br>
+        <span style="
+            color:#ffd7ef;
+            font-size:12px;
+            opacity:0.95;
+        ">
+        <p id="hint24" style="
+    margin:0 0 10px;
+    font-size:12px;
+    color:#ffd7ef;
+    display:none;
+">
+    La boule dont le parfum commence le plus tôt dans l'alphabet doit être en bas
+</p>
+        </span>
+    </p>
 
 
 
 
            <canvas id="iceCanvas24" width="900" height="600"
-               style="border:4px solid #ffdd99; border-radius:8px; box-shadow:0 0 25px #ffdd99aa; background:#1a0f08;">
+               style="border:4px solidrgb(198, 132, 252); border-radius:8px; box-shadow:0 0 25px #ffdd99aa; background:#1a0f08;">
            </canvas>
 
 
 
-
-           <p id="msg24" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-               Choisis une boule et dépose-la sur le cornet.
-           </p>
        </div>
    `;
 
@@ -49,16 +70,16 @@ export function startGame39(container, onFinish) {
 
    /* ---------- PARFUMS ---------- */
    const FLAVORS = [
-       { name: "caramel", color: "#c68c53" },
+       { name: "caramel", color: "#d89a57" },
        { name: "chocolat", color: "#5a3a1e" },
-       { name: "citron", color: "#fff36b" },
+       { name: "citron", color: "#ffe95c" },
        { name: "fraise", color: "#ff6b81" },
        { name: "menthe", color: "#7fffd4" },
        { name: "myrtille", color: "#6b5bff" },
        { name: "pistache", color: "#9be39b" },
-       { name: "vanille", color: "#f3e5ab" },
+       { name: "vanille", color: "#fff1c9" },
        // parfum trompeur
-       { name: "yaourt", color: "#ffffff" }
+       { name: "yaourt", color: "#f5f5ff" }
    ];
 
 
@@ -87,38 +108,57 @@ export function startGame39(container, onFinish) {
 
 
 
-   const scoops = chosen.map((f, i) => ({
-       id: i,
-       flavor: f.name,
-       color: f.color,
-       x: scoopStartX + i * scoopGapX,
-       y: scoopBaseY,
-       r: scoopRadius,
-       homeX: scoopStartX + i * scoopGapX,
-       homeY: scoopBaseY,
-       placedIndex: null,
-       melting: false,
-       meltProgress: 0,
-       dripY: null
-   }));
+   const scoops = chosen.map((f, i) => {
+
+    let x = scoopStartX + i * scoopGapX;
+
+    if (i < 3) {
+        x -= canvasWidth * 0.05;
+    } else {
+        x += canvasWidth * 0.10;
+    }
+
+    return {
+        id: i,
+        flavor: f.name,
+        color: f.color,
+
+        x,
+        y: scoopBaseY,
+        r: scoopRadius,
+
+        homeX: x,
+        homeY: scoopBaseY,
+
+        placedIndex: null,
+        melting: false,
+        meltProgress: 0,
+        dripY: null
+    };
+});
 
 
 
 
    game24 = {
-       ctx,
-       canvas,
-       onFinish,
-       scoops,
-       cone,
-       winningOrder,
-       placed: [],
-       dragging: null,
-       dragOffsetX: 0,
-       dragOffsetY: 0,
-       scoopStackStep: scoopRadius * (55 / 45),
-       gameOver: false
-   };
+    ctx,
+    canvas,
+    onFinish,
+    scoops,
+    cone,
+    winningOrder,
+
+    placed: [],
+    dragging: null,
+
+    dragOffsetX: 0,
+    dragOffsetY: 0,
+
+    scoopStackStep: scoopRadius * (55 / 45),
+
+    gameOver: false,
+    failedAttempts: 0
+};
 
 
 
@@ -155,15 +195,17 @@ function onMouseDown24(e) {
 
 
 
-
    for (let i = game24.scoops.length - 1; i >= 0; i--) {
-       const s = game24.scoops[i];
-       if (!s.melting && dist24(x, y, s.x, s.y) < s.r) {
-           game24.dragging = s;
-           game24.dragOffsetX = x - s.x;
-           game24.dragOffsetY = y - s.y;
-           return;
-       }
+    const s = game24.scoops[i];
+
+    if (s.placedIndex !== null) continue;
+
+    if (!s.melting && dist24(x, y, s.x, s.y) < s.r) {
+        game24.dragging = s;
+        game24.dragOffsetX = x - s.x;
+        game24.dragOffsetY = y - s.y;
+        return;
+    }
    }
 }
 
@@ -223,66 +265,73 @@ function onMouseUp24() {
 
 
 function isOverCone24(s) {
-   const c = game24.cone;
-   return (
-       s.x > c.x - game24.canvas.width * (60 / 900) &&
-       s.x < c.x + game24.canvas.width * (60 / 900) &&
-       s.y > c.y - game24.canvas.height * (220 / 600) &&
-       s.y < c.y + game24.canvas.height * (20 / 600)
-   );
-}
+    const c = game24.cone;
+ 
+    const stackHeight =
+       game24.placed.length * game24.scoopStackStep;
+ 
+    const targetY =
+       c.y - stackHeight;
+ 
+    return (
+       Math.abs(s.x - c.x) < 90 &&
+       Math.abs(s.y - targetY) < 70
+    );
+ }
 
 
 
 
-function placeScoop24(s) {
-   const index = game24.placed.length;
-
-
-
-
-   s.x = game24.cone.x;
+ function placeScoop24(s) {
+    const index = game24.placed.length;
+ 
+    s.x = game24.cone.x;
     s.y = game24.cone.y - index * game24.scoopStackStep;
-   s.placedIndex = index;
+    s.placedIndex = index;
+ 
+    game24.placed.push(s);
+ 
+    setMsg24(`Tu as ajouté : ${s.flavor}`);
+ 
+    if (game24.placed.length === game24.scoops.length) {
+        checkWin24();
+    }
+ }
 
 
 
 
-   game24.placed.push(s);
+ function checkWin24() {
+    const correct = game24.placed.every((s, i) =>
+        s.flavor === game24.winningOrder[i].name
+    );
+ 
+    if (correct) {
+        setMsg24("Bravo !");
+        game24.gameOver = true;
+        gameManager.addTimeout(
+            setTimeout(() => game24.onFinish && game24.onFinish(), 1500)
+        );
+    } else {
+ 
+        game24.failedAttempts++;
+ 
+        if (game24.failedAttempts >= 2) {
 
-
-
-
-   setMsg24(`Tu as ajouté : ${s.flavor}`);
-
-
-
-
-   if (game24.placed.length === game24.scoops.length) {
-       checkWin24();
-   }
-}
-
-
-
-
-function checkWin24() {
-   const correct = game24.placed.every((s, i) =>
-       s.flavor === game24.winningOrder[i].name
-   );
-
-
-
-
-   if (correct) {
-       setMsg24("🎉 Bravo ! Tu as trouvé l'ordre secret : l'ordre alphabétique (de bas en haut) !");
-       game24.gameOver = true;
-       gameManager.addTimeout(setTimeout(() => game24.onFinish && game24.onFinish(), 1500));
-   } else {
-       setMsg24("❌ Mauvais ordre… Les boules fondent !");
-       triggerMelting24();
-   }
-}
+            const hint = document.getElementById("hint24");
+        
+            if (hint) {
+                hint.style.display = "block";
+            }
+        
+            setMsg24("Mauvais ordre… Les boules fondent !");
+        } else {
+            setMsg24("Mauvais ordre… Les boules fondent !");
+        }
+ 
+        triggerMelting24();
+    }
+ }
 
 
 
@@ -375,18 +424,121 @@ function render24() {
 
 
 
-
-/* ---------- DESSIN ---------- */
-
-
-
-
 function drawBackground24(ctx, canvas) {
-   const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-   grad.addColorStop(0, "#1a0f08");
-   grad.addColorStop(1, "#3b2414");
-   ctx.fillStyle = grad;
-   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Mur rose pastel
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+
+    grad.addColorStop(0, "#fff1f7");
+    grad.addColorStop(1, "#ffd9eb");
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Halo doux derrière le cornet
+    const glow = ctx.createRadialGradient(
+        canvas.width * 0.5,
+        canvas.height * 0.42,
+        0,
+        canvas.width * 0.5,
+        canvas.height * 0.42,
+        220
+    );
+
+    glow.addColorStop(0, "rgba(255,255,255,0.55)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Halo gauche
+    const halo1 = ctx.createRadialGradient(
+        canvas.width * 0.2,
+        canvas.height * 0.2,
+        0,
+        canvas.width * 0.2,
+        canvas.height * 0.2,
+        180
+    );
+    
+    halo1.addColorStop(0, "rgba(253, 251, 255, 0.15)");
+    halo1.addColorStop(1, "rgba(252, 233, 255, 0.89)");
+    
+    ctx.fillStyle = halo1;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Halo droite
+    const halo2 = ctx.createRadialGradient(
+        canvas.width * 0.8,
+        canvas.height * 0.25,
+        0,
+        canvas.width * 0.8,
+        canvas.height * 0.25,
+        160
+    );
+    
+    halo2.addColorStop(0, "rgba(255,180,220,0.15)");
+    halo2.addColorStop(1, "rgba(255,180,220,0)");
+    
+    ctx.fillStyle = halo2;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Comptoir rose bonbon
+    const counterGrad = ctx.createLinearGradient(
+        0,
+        canvas.height * 0.75,
+        0,
+        canvas.height
+    );
+
+    counterGrad.addColorStop(0, "#ff9ad5");
+    counterGrad.addColorStop(0.5, "#ff82ca");
+    counterGrad.addColorStop(1, "#ff63bc");
+
+    ctx.fillStyle = counterGrad;
+    ctx.fillRect(
+        0,
+        canvas.height * 0.75,
+        canvas.width,
+        canvas.height * 0.25
+    );
+
+    // Reflet du comptoir
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.fillRect(
+        0,
+        canvas.height * 0.75,
+        canvas.width,
+        10
+    );
+
+    // Enseigne
+    ctx.shadowColor = "#ff80c8";
+    ctx.shadowBlur = 18;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 42px VT323";
+    ctx.textAlign = "center";
+
+
+    ctx.shadowBlur = 0;
+
+    // Store rayé
+    for (let i = 0; i < 10; i++) {
+        ctx.fillStyle =
+            i % 2 === 0
+                ? "#ffffff"
+                : "#ff9fcf";
+
+        ctx.fillRect(
+            i * (canvas.width / 10),
+            0,
+            canvas.width / 10,
+            30
+        );
+    }
+
+  
 }
 
 
