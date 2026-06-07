@@ -5,7 +5,23 @@ import { gameManager } from "@/lib/gameCleanup";
 export function startGame6(container, onFinish) {
   container.innerHTML = "";
 
-  const title = createGameTitle("Déchiffre l'énigme !");
+    // Police Orbitron
+    const orbitronFont = document.createElement("link");
+    orbitronFont.rel = "stylesheet";
+    orbitronFont.href =
+      "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap";
+  
+    document.head.appendChild(orbitronFont);
+  
+    const title = createGameTitle("Déchiffre l'énigme !");
+    title.style.fontFamily = "Orbitron, sans-serif";
+    
+    title.style.color = "#FFEAF8";
+  
+    title.style.textShadow = `
+      0 0 4px rgba(255,255,255,0.7),
+      0 0 8px rgba(255, 192, 203, 0.95)
+    `;
   const rebusDiv = createRebusDisplay("7️⃣👍");
   rebusDiv.style.fontFamily =
   "Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif";
