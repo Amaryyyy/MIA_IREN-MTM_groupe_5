@@ -7,6 +7,8 @@ export function startGame6(container, onFinish) {
 
   const title = createGameTitle("Déchiffre l'énigme !");
   const rebusDiv = createRebusDisplay("7️⃣👍");
+  rebusDiv.style.fontFamily =
+  "Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif";
   const input = createInputField();
   const button = createValidationButton();
   const feedbackDiv = createFeedbackDiv();
