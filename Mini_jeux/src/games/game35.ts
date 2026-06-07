@@ -263,9 +263,9 @@ export function startGame35(container, onFinish) {
     gameManager.addAnimationFrame(frame);
   }
 
-  function endGame(msg) {
+  function endGame() {
     running = false;
-    alert(msg);
+    gameManager.cleanup();
     onFinish && onFinish();
   }
 

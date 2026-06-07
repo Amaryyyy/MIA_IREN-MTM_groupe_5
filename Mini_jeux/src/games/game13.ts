@@ -585,8 +585,9 @@ canvas.style.boxShadow = `
   // END
   // =========================
   function endGame() {
+    gameManager.cleanup();
     onFinish && onFinish();
-}
+  }
 
   // =========================
   // START
