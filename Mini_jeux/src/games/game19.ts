@@ -6,7 +6,7 @@ export function startGame19(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family: 'VT323', monospace; color: white; padding: 20px; border-radius: 15px;">
             <div style="font-size: 1.1em; margin-bottom: 8px;">
-                🔦 Miroirs placés : <span id="mirrors17" style="color:#00e5ff;">0</span> / 3
+                 Miroirs placés : <span id="mirrors17" style="color:#00e5ff;">0</span> / 3
             </div>
 
        <div style="display:inline-block; padding:0; border-radius:12px;">

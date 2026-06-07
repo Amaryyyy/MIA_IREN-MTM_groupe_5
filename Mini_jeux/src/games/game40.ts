@@ -6,7 +6,7 @@ let game40 = {};
 export function startGame40(container, onFinish) {
   container.innerHTML = `
     <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background: transparent; padding: 20px; border-radius: 15px;">
-      <div style="font-size: 1.2em; margin-bottom: 10px;">🌀 Mouvements : <span id="moves17" style="color: #2ecc71;">0</span></div>
+      <div style="font-size: 1.2em; margin-bottom: 10px;"> Mouvements : <span id="moves17" style="color: #2ecc71;">0</span></div>
       <canvas id="cubeCanvas" width="360" height="360" style="border: 4px solid #34495e; border-radius: 8px; box-shadow: 0 0 12px rgba(79,157,255,0.12); cursor: pointer;"></canvas>
       <p id="msg17" style="margin-top: 15px; font-weight: bold; min-height: 24px;">Réorganise les lignes par couleur.</p>
     </div>
@@ -207,7 +207,7 @@ function checkCubeWin() {
     }
   }
 
-  document.getElementById("msg17").textContent = "🎉 Bravo ! Toutes les lignes sont monochromes !";
+  document.getElementById("msg17").textContent = " Bravo ! Toutes les lignes sont monochromes !";
   gameManager.addTimeout(setTimeout(game40.onFinish, 1500));
 }
 

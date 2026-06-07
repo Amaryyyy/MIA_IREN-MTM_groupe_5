@@ -288,7 +288,7 @@ if (dist <= t.rBlue) {
         if (game20.score === 5) {
     
             document.getElementById("msg20").textContent =
-                "🎉 BRAVO ! Tu as obtenu 5 points !";
+                "BRAVO ! Tu as obtenu 5 points !";
     
             setTimeout(() => {
                 game20.onFinish && game20.onFinish();
@@ -297,7 +297,7 @@ if (dist <= t.rBlue) {
         } else {
     
             document.getElementById("msg20").textContent =
-                "❌ Tu n'as pas 5 points. Partie perdue !";
+                "Tu n'as pas 5 points. Partie perdue !";
     
             setTimeout(() => {
                 resetGame20();
