@@ -584,11 +584,12 @@ canvas.style.boxShadow = `
   // =========================
   // END
   // =========================
+
   function endGame() {
+    running = false;
     gameManager.cleanup();
     onFinish && onFinish();
   }
-
   // =========================
   // START
   // =========================
