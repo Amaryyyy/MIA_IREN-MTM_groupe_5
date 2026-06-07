@@ -5,31 +5,34 @@ let game20 = {};
 
 export function startGame20(container, onFinish) {
     container.innerHTML = `
-        <div style="
-            display:inline-block;
-            background:#050509;
-            padding:4px;
-            border-radius:8px;
-            width:fit-content;
-            height:fit-content;
-            text-align:center;
-            font-family:'VT323', monospace;
-            color:white;
-        ">
+                <div style="
+                display:inline-block;
+                padding:0;
+                background:transparent;
+                text-align:center;
+                font-family:Orbitron,sans-serif;
+            ">
             
             <div style="font-size:1.2em; margin-bottom:10px;">
-                🎯 Fléchettes : <span id="darts20" style="color:#00e5ff;">0</span> / 5  
+                 Fléchettes : <span id="darts20" style="color:#00e5ff;">0</span> / 5  
                 | Score : <span id="score20" style="color:#ffd34f;">0</span>
             </div>
 
             <canvas id="dartCanvas" width="520" height="380"
                 style="
-                    display:block;
-                    border:4px solid #ff3860;
-                    border-radius:8px;
-                    box-shadow:0 0 25px #ff3860aa;
-                    cursor:crosshair;
-                ">
+                display:block;
+
+                border:2px solid rgba(246, 92, 92, 0.7);
+                border-radius:20px;
+
+                background:#060814;
+
+                box-shadow:
+                    0 0 10px rgba(139,92,246,0.35),
+                    0 0 25px rgba(238, 41, 34, 0.2);
+
+                cursor:crosshair;
+            "
             </canvas>
 
             <div style="margin-top:10px;">
@@ -64,9 +67,10 @@ export function startGame20(container, onFinish) {
         darts: [],
         gravity: 0.25,
         score: 0,
-
+        animationId: null,
+    
         throwPos: { x: 80, y: 300 },
-
+    
         target: {
             x: 420,
             y: 180,
@@ -85,12 +89,18 @@ export function startGame20(container, onFinish) {
 /* ------------------ RESET ------------------ */
 
 function resetGame20() {
+
+    if (game20.animationId) {
+        cancelAnimationFrame(game20.animationId);
+        game20.animationId = null;
+    }
+
     game20.darts = [];
     game20.dartsThrown = 0;
     game20.score = 0;
 
-    document.getElementById("darts20").textContent = 0;
-    document.getElementById("score20").textContent = 0;
+    document.getElementById("darts20").textContent = "0";
+    document.getElementById("score20").textContent = "0";
 
     document.getElementById("msg20").textContent =
         "+1 si tu rates, -1 si tu touches. Tu dois finir avec 5 points.";
@@ -131,14 +141,25 @@ function throwDart20(e) {
 /* ------------------ ANIMATION ------------------ */
 
 function animateDarts20() {
+
+    if (game20.animationId) {
+        cancelAnimationFrame(game20.animationId);
+    }
+
     function frame() {
+
         updateDarts20();
         renderDartGame20();
 
-        if (checkEnd20()) return;
+        if (checkEnd20()) {
+            game20.animationId = null;
+            return;
+        }
 
-        requestAnimationFrame(frame);
+        game20.animationId =
+            requestAnimationFrame(frame);
     }
+
     frame();
 }
 
@@ -235,16 +256,59 @@ function renderDartGame20() {
     const { width, height } = game20.canvas;
 
     // Cadran noir ajusté
+    ctx.clearRect(0, 0, width, height);
+
     ctx.fillStyle = "#050509";
-    ctx.fillRect(6, 6, width - 12, height - 12);
+    ctx.fillRect(0, 0, width, height);
 
     drawTarget20(ctx, game20.target);
 
     ctx.fillStyle = "#ff3860";
     for (const d of game20.darts) {
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, 5, 0, Math.PI * 2);
-        ctx.fill();
+        for (const d of game20.darts) {
+
+            const angle = Math.atan2(d.vy, d.vx);
+        
+            ctx.save();
+            ctx.translate(d.x, d.y);
+            ctx.rotate(angle);
+        
+            // Pointe
+            ctx.fillStyle = "#d1d5db";
+            ctx.beginPath();
+            ctx.moveTo(12, 0);
+            ctx.lineTo(4, -3);
+            ctx.lineTo(4, 3);
+            ctx.closePath();
+            ctx.fill();
+        
+            // Corps
+            ctx.strokeStyle = "#f8fafc";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-8, 0);
+            ctx.lineTo(10, 0);
+            ctx.stroke();
+        
+            // Ailerons
+            ctx.fillStyle = "#ff3860";
+        
+            ctx.beginPath();
+            ctx.moveTo(-8, 0);
+            ctx.lineTo(-14, -5);
+            ctx.lineTo(-10, 0);
+            ctx.closePath();
+            ctx.fill();
+        
+            ctx.beginPath();
+            ctx.moveTo(-8, 0);
+            ctx.lineTo(-14, 5);
+            ctx.lineTo(-10, 0);
+            ctx.closePath();
+            ctx.fill();
+        
+            ctx.restore();
+        }
     }
 
     ctx.fillStyle = "#86eefa";
