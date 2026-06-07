@@ -4,69 +4,75 @@ import { gameManager } from "@/lib/gameCleanup";
 let game19 = {};
 
 export function startGame21(container, onFinish) {
-    container.innerHTML = `
-        <div style="text-align:center; font-family:Orbitron,sans-serif; color:white;">
-            <h2 style="
-    margin:0 0 45px;
-    font-size:15px;
-    font-weight:400;
-    color:#f8f8ff;
-">Clique une pile pour prendre une fourmi, puis une autre pour la poser. </h2>
-          <p id="objective19"
-   style="
-      display:none;
-      margin:-3px 0 8px 0;
-      font-family:Orbitron,sans-serif;
-      font-size:15px;
-      color:white;
-   ">
-   Objectif :
-   <span style="color:#ff3860;">
-      Empiler les fourmis avec la plus petite en bas et la plus grande en haut !
-   </span>
-</p>
-            <canvas id="hanoiCanvas19" width="600" height="300"
-                style="
-                    border:4px solidrgb(247, 138, 160);
-                    border-radius:8px;
-                    box-shadow:0 0 25px #ff3860aa;
-                    cursor:pointer;
-                    background:#050509;
-                ">
-            </canvas>
+container.innerHTML = `
+<div style="text-align:center; font-family:Orbitron,sans-serif; color:white;">
 
-           <p id="msg19" style="
-    margin-top:10px;
-    min-height:24px;
-    font-size:13px;
-    font-family:Orbitron,sans-serif;
-">
-                Clique une pile pour prendre une fourmi, puis une autre pour la poser.
-            </p>
-        </div>
-    `;
+    <h2 style="
+        margin:0 0 20px;
+        font-size:15px;
+        font-weight:400;
+        color:#f8f8ff;
+    ">
+        Clique une pile pour prendre une fourmi, puis une autre pour la poser.
+    </h2>
 
-    const canvas = container.querySelector("#hanoiCanvas19");
-    const ctx = canvas.getContext("2d");
+    <p id="hint19"
+       style="
+          display:none;
+          margin:0 0 10px 0;
+          font-family:Orbitron,sans-serif;
+          font-size:14px;
+          color:#ff3860;
+       ">
+       La plus petite fourmi doit finir tout en bas.
+    </p>
 
-    game19 = {
-        ctx,
-        canvas,
-        onFinish,
-        selected: null,
-        moves: 0,
-    
-        piles: [
-            [1, 2, 3, 4],
-            [],
-            []
-        ],
-    
-        colors: ["#afff9f", "#86eefa", "#f79df8", "#ff3860"]
-    };
+    <canvas id="hanoiCanvas19"
+        width="600"
+        height="300"
+        style="
+            border:4px solid rgba(21, 13, 18, 0.79);
+            border-radius:8px;
+            box-shadow:0 0 25px #ff3860aa;
+            cursor:pointer;
+            background:#050509;
+        ">
+    </canvas>
 
-    canvas.addEventListener("click", clickHanoi19);
-    renderHanoi19();
+    <p id="msg19"
+       style="
+          margin-top:10px;
+          min-height:24px;
+          font-size:13px;
+          font-family:Orbitron,sans-serif;
+       ">
+       Clique une pile pour prendre une fourmi, puis une autre pour la poser.
+    </p>
+
+</div>
+`;
+const canvas = container.querySelector("#hanoiCanvas19");
+const ctx = canvas.getContext("2d");
+
+game19 = {
+    ctx,
+    canvas,
+    onFinish,
+    selected: null,
+    moves: 0,
+    hintShown: false,
+
+    piles: [
+        [3, 1],
+        [4],
+        [2]
+    ],
+
+    colors: ["#afff9f", "#86eefa", "#f79df8", "#ff3860"]
+};
+
+canvas.addEventListener("click", clickHanoi19);
+renderHanoi19();
 }
 
 /* ------------------ CLICK ------------------ */
@@ -106,26 +112,30 @@ function moveHanoi19(from, to) {
 
     game19.moves++;
 
-    if (game19.moves >= 6) {
-        document.getElementById("objective19").style.display = "block";
+    if (game19.moves >= 10 && !game19.hintShown) {
+        game19.hintShown = true;
+        document.getElementById("hint19").style.display = "block";
     }
 
     checkWinHanoi19();
 }
 
-
 /* ------------------ WIN ------------------ */
 
 function checkWinHanoi19() {
-    // 👉 Condition de victoire : la plus petite en bas → la plus grande en haut
     const target = [1, 2, 3, 4];
 
-    for (const pile of game19.piles) {
-        if (pile.length === 4 && JSON.stringify(pile) === JSON.stringify(target)) {
-            document.getElementById("msg19").textContent =
-                " Bravo ! La plus petite est bien en bas, et la plus grande en haut !";
-            setTimeout(() => game19.onFinish && game19.onFinish(), 1500);
-        }
+    if (
+        JSON.stringify(game19.piles[0]) === JSON.stringify(target) ||
+        JSON.stringify(game19.piles[1]) === JSON.stringify(target) ||
+        JSON.stringify(game19.piles[2]) === JSON.stringify(target)
+    ) {
+        document.getElementById("msg19").textContent =
+            " Bravo ! Les fourmis sont parfaitement rangées.";
+
+        setTimeout(() => {
+            game19.onFinish && game19.onFinish();
+        }, 1500);
     }
 }
 
@@ -167,7 +177,7 @@ function renderHanoi19() {
 
     // Highlight pile sélectionnée
     if (game19.selected !== null) {
-        ctx.strokeStyle = "#afff9f";
+        ctx.strokeStyle = "#7DFFA8";
         ctx.lineWidth = 4;
         ctx.strokeRect(
             game19.selected * pileWidth + 5,
