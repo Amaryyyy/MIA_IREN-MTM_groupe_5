@@ -242,7 +242,7 @@ const WORLD_HEIGHT = canvas.height;
 
     // LOSE
     if (player.size > 40) {
-      endGame("💀 Trop gros !");
+      endGame("Trop gros !");
     }
 
     // WIN CONDITION
@@ -254,7 +254,7 @@ const WORLD_HEIGHT = canvas.height;
 
     if (smallTime >= requiredSmallTime) {
       endGame(
-        "🎉 Tu es resté petit 20s !"
+        "Tu es resté petit 20s !"
       );
     }
   }
@@ -356,12 +356,6 @@ const WORLD_HEIGHT = canvas.height;
       `Taille: ${player.size.toFixed(1)}`,
       10,
       25
-    );
-
-    ctx.fillText(
-      `Temps petit: ${smallTime.toFixed(1)} / 20`,
-      10,
-      50
     );
   }
 
