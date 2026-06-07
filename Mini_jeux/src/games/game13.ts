@@ -414,10 +414,8 @@ canvas.style.boxShadow = `
 
       exitTimer++;
 
-      if (exitTimer > 60) {
-        endGame(
-          "🧠 Bien joué t’as compris le puzzle !"
-        );
+      if (exitTimer > 10) {
+        endGame();
       }
 
     } else {
