@@ -23,7 +23,7 @@ export function startGame18(container, onFinish) {
             background: transparent;
         ">
             <div style="font-size: 1.2em; margin-bottom: 10px; font-family: 'VT323', monospace; color: #cfe8ff; text-shadow: 0 0 8px rgba(0,229,255,0.15);">
-                🔄 Mouvements : <span id="moves16" style="color: #00e5ff;">0</span>
+                 Mouvements : <span id="moves16" style="color: #00e5ff;">0</span>
             </div>
             <canvas id="flipCanvas" width="400" height="400"
                 style="

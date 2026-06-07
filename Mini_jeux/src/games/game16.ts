@@ -46,7 +46,7 @@ export function startGame16(container, onFinish) {
                     color: #9a4bff;
                     text-shadow: 0 0 10px rgba(154,75,255,0.9), 0 0 24px rgba(255,200,80,0.06);
                     transform: translateZ(0);
-                ">◈ GALAXY SUM ◈</span>
+                "> </span>
             </div>
 
             <div id="g16-legend" style="

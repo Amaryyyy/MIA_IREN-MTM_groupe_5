@@ -169,7 +169,7 @@ export function startGame36(container, onFinish) {
 
   function win() {
     gameManager.cleanup();
-    setFeedback(feedbackDiv, true, "🎉 Bien joué… tu as perdu !");
+    setFeedback(feedbackDiv, true,  "Bien joué… tu as perdu !");
     gameManager.addTimeout(setTimeout(onFinish, 1200));
   }
 

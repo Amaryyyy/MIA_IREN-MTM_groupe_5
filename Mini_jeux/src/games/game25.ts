@@ -6,7 +6,7 @@ let game23 = {};
 export function startGame25(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family:'VT323', monospace; color:white; background:transparent; padding:20px; border-radius:15px; max-width:960px; margin:0 auto; overflow:hidden; display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <h2 style="margin:0 0 8px;">🧩 Color Slots — Ice Board Neon Edition</h2>
+            
             <p style="margin:0 0 8px; font-size:0.95em;">
 
             <canvas id="shapeCanvas23" width="900" height="650"

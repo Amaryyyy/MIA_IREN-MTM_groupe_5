@@ -11,7 +11,7 @@ export function startGame37(container, onFinish) {
 
   // --- UI ---
   const title = document.createElement("h2");
-  title.textContent = "Snake Futuriste – Grandis avec les objets";
+  title.textContent = " ";
   title.style.textAlign = "center";
   title.style.color = "#7dd3ff";
 

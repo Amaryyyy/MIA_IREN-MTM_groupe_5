@@ -6,7 +6,7 @@ let pizzaGame = null;
 export function startGame38(container, onFinish) {
     container.innerHTML = `
         <div style="text-align:center; font-family: 'Segoe UI', sans-serif; color: white; background:#1a1a1a; padding:20px; border-radius:15px;">
-            <div style="font-size:1.2em; margin-bottom:10px;">🔪 Coupures : 
+            <div style="font-size:1.2em; margin-bottom:10px;"> Coupures : 
                 <span id="pizzaCuts" style="color:#ffcc00;">0</span>
             </div>
 
