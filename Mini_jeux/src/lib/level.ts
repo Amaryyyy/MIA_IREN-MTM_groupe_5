@@ -1,6 +1,7 @@
 import type { Level } from "@/types/game";
 
 const levels: Level[] = [
+//1
   { game: "game1", difficulty: "easy", title: "Reverse Maze" },
   { game: "game31", difficulty: "hard", title: "Linear Drop" },
   { game: "game8", difficulty: "hard", title: "Complementaries" },
