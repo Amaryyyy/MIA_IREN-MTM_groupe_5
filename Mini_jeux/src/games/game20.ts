@@ -13,16 +13,32 @@ export function startGame20(container, onFinish) {
                 font-family:Orbitron,sans-serif;
             ">
             
-            <div style="font-size:1.2em; margin-bottom:10px;">
-                 Fléchettes : <span id="darts20" style="color:#00e5ff;">0</span> / 5  
-                | Score : <span id="score20" style="color:#ffd34f;">0</span>
-            </div>
+            <div style="
+    font-size:1.2em;
+    margin-bottom:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+">
+
+    <div>
+        Fléchettes :
+        <span id="darts20" style="color:#00e5ff;">0</span> / 5
+    </div>
+
+    <div>
+        Score :
+        <span id="score20" style="color:#ffd34f;">0</span>
+    </div>
+
+</div>
 
             <canvas id="dartCanvas" width="520" height="380"
                 style="
                 display:block;
 
-                border:2px solid rgba(246, 92, 92, 0.7);
+                border:2px solid rgba(161, 92, 246, 0.53);
                 border-radius:20px;
 
                 background:#060814;
@@ -65,7 +81,7 @@ export function startGame20(container, onFinish) {
         dartsThrown: 0,
         maxDarts: 5,
         darts: [],
-        gravity: 0.12,
+        gravity: 0,
         score: 0,
         animationId: null,
     
@@ -74,8 +90,8 @@ export function startGame20(container, onFinish) {
         target: {
             x: 420,
             y: 180,
-            rRed: 20,
-            rWhite: 40,
+            rRed: 28,
+            rWhite: 48,
             rBlue: 70
         }
     };
@@ -121,7 +137,7 @@ function throwDart20(e) {
     const dy = my - game20.throwPos.y;
 
     const angle = Math.atan2(dy, dx);
-    const power = Math.min(12, Math.hypot(dx, dy) / 20);
+    const power = Math.min(20, Math.hypot(dx, dy) / 20);
 
     game20.darts.push({
         x: game20.throwPos.x,
@@ -173,11 +189,14 @@ function updateDarts20() {
         d.x += d.vx;
         d.y += d.vy;
 
-        // Stop si touche le sol
-        if (d.y >= game20.canvas.height - 10) {
+        if (
+            d.y >= game20.canvas.height - 10 ||
+            d.x > game20.canvas.width + 50 ||
+            d.x < -50
+        ) {
             d.stopped = true;
         }
-    }
+}
 }
 
 /* ------------------ SCORING + COLLISIONS ------------------ */
@@ -189,7 +208,15 @@ function checkEnd20() {
 
         if (d.scored) continue;
 
-        const dist = Math.hypot(d.x - t.x, d.y - t.y);
+        const angle = Math.atan2(d.vy, d.vx);
+
+    const tipX = d.x + Math.cos(angle) * 12;
+    const tipY = d.y + Math.sin(angle) * 12;
+
+    const dist = Math.hypot(
+        tipX - t.x,
+        tipY - t.y
+    );
 
         /* -------------------------
            🎯 COLLISION IMMÉDIATE
@@ -206,14 +233,41 @@ function checkEnd20() {
             return true;
         }
 
-        // Touche la cible (bleu, blanc, rouge)
-        if (dist <= t.rBlue) {
-            game20.score -= 1;
-            d.scored = true;
-            d.stopped = true;
-            document.getElementById("score20").textContent = game20.score;
-            continue;
-        }
+ 
+
+// Anneau blanc
+if (dist <= t.rWhite) {
+
+    game20.score -= 1;
+
+    d.x += d.vx * 2;
+    d.y += d.vy * 2;
+
+    d.scored = true;
+    d.stopped = true;
+
+    document.getElementById("score20").textContent =
+        game20.score;
+
+    continue;
+}
+
+// Anneau bleu
+if (dist <= t.rBlue) {
+
+    game20.score -= 1;
+
+    d.x += d.vx * 2;
+    d.y += d.vy * 2;
+
+    d.scored = true;
+    d.stopped = true;
+
+    document.getElementById("score20").textContent =
+        game20.score;
+
+    continue;
+}
 
         /* -------------------------
            🎯 RATE LA CIBLE
@@ -226,28 +280,35 @@ function checkEnd20() {
         }
     }
 
-    /* -------------------------
-       🎯 FIN DES 5 FLÉCHETTES
-    -------------------------- */
-
-    if (game20.dartsThrown === game20.maxDarts &&
-        game20.darts.every(d => d.scored)) {
-
+    if (
+        game20.dartsThrown >= game20.maxDarts &&
+        game20.darts.every(d => d.stopped)
+    ) {
+    
         if (game20.score === 5) {
+    
             document.getElementById("msg20").textContent =
                 "🎉 BRAVO ! Tu as obtenu 5 points !";
-            setTimeout(() => game20.onFinish && game20.onFinish(), 1500);
+    
+            setTimeout(() => {
+                game20.onFinish && game20.onFinish();
+            }, 1500);
+    
         } else {
+    
             document.getElementById("msg20").textContent =
                 "❌ Tu n'as pas 5 points. Partie perdue !";
-            setTimeout(() => resetGame20(), 1500);
+    
+            setTimeout(() => {
+                resetGame20();
+            }, 1500);
         }
-
+    
         return true;
     }
-
+    
     return false;
-}
+    }
 
 /* ------------------ RENDER ------------------ */
 
@@ -265,7 +326,6 @@ function renderDartGame20() {
 
     ctx.fillStyle = "#ff3860";
     for (const d of game20.darts) {
-        for (const d of game20.darts) {
 
             const angle = Math.atan2(d.vy, d.vx);
         
@@ -274,7 +334,7 @@ function renderDartGame20() {
             ctx.rotate(angle);
         
             // Pointe
-            ctx.fillStyle = "#d1d5db";
+            ctx.fillStyle = "#1e3a8a";
             ctx.beginPath();
             ctx.moveTo(12, 0);
             ctx.lineTo(4, -3);
@@ -283,7 +343,7 @@ function renderDartGame20() {
             ctx.fill();
         
             // Corps
-            ctx.strokeStyle = "#f8fafc";
+            ctx.strokeStyle = "#6d28d9";
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(-8, 0);
@@ -291,8 +351,7 @@ function renderDartGame20() {
             ctx.stroke();
         
             // Ailerons
-            ctx.fillStyle = "#ff3860";
-        
+            ctx.fillStyle = "#1e3a8a";
             ctx.beginPath();
             ctx.moveTo(-8, 0);
             ctx.lineTo(-14, -5);
@@ -309,7 +368,7 @@ function renderDartGame20() {
         
             ctx.restore();
         }
-    }
+    
 
     ctx.fillStyle = "#86eefa";
     ctx.beginPath();
@@ -318,18 +377,36 @@ function renderDartGame20() {
 }
 
 function drawTarget20(ctx, t) {
+
+    ctx.save();
+
+    // légère rotation perspective
+    ctx.translate(t.x, t.y);
+
+    // écrasement horizontal
+    ctx.scale(0.81, 1);
+
+    // halo
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#3b82f6";
+
+    // bleu
     ctx.fillStyle = "#1b3bff";
     ctx.beginPath();
-    ctx.arc(t.x, t.y, t.rBlue, 0, Math.PI * 2);
+    ctx.arc(0, 0, t.rBlue, 0, Math.PI * 2);
     ctx.fill();
 
+    // blanc
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(t.x, t.y, t.rWhite, 0, Math.PI * 2);
+    ctx.arc(0, 0, t.rWhite, 0, Math.PI * 2);
     ctx.fill();
 
+    // rouge
     ctx.fillStyle = "#ff3860";
     ctx.beginPath();
-    ctx.arc(t.x, t.y, t.rRed, 0, Math.PI * 2);
+    ctx.arc(0, 0, t.rRed, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.restore();
 }
