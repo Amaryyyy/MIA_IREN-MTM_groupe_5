@@ -65,11 +65,11 @@ export function startGame20(container, onFinish) {
         dartsThrown: 0,
         maxDarts: 5,
         darts: [],
-        gravity: 0.25,
+        gravity: 0.12,
         score: 0,
         animationId: null,
     
-        throwPos: { x: 80, y: 300 },
+        throwPos: { x: 120, y: 260 },
     
         target: {
             x: 420,
