@@ -10,7 +10,7 @@ const levels: Level[] = [
   { game: "game25", difficulty: "hard", title: "API Assault" },
   { game: "game10", difficulty: "hard", title: "Cyber Nexus" },
   { game: "game20", difficulty: "hard", title: "Slot the Darts" },
-  { game: "game26", difficulty: "hard", title: "Crazy Draft" },
+  { game: "game26", difficulty: "hard", title: "Color Chaos" },
   { game: "game21", difficulty: "hard", title: "Debugging Duel" },
   { game: "game12", difficulty: "hard", title: "Pixel Peril" },
   { game: "game15", difficulty: "hard", title: "Fast Cars" },

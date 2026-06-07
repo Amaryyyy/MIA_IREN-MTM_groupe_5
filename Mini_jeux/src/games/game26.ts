@@ -2,25 +2,54 @@
 import { gameManager } from "@/lib/gameCleanup";let game26 = {};
 
 export function startGame26(container, onFinish) {
+
+    const GAME_WIDTH = Math.min(
+        window.innerWidth * 0.78,
+        720
+    );
+
+    const GAME_HEIGHT = Math.min(
+        window.innerHeight * 0.80,
+        650
+    );
+
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:#111; background:#e0e0e0; padding:20px; border-radius:15px;">
-            <h2 style="margin:0 0 8px;">🖌️ Color Chaos — Le coloriage raté qui gagne</h2>
-            <p style="margin:0 0 8px; font-size:0.95em;">
-                Colorie le dessin avec le pinceau.<br>
-                <span style="color:#c0392b;">Tu crois devoir colorier proprement… mais la vraie victoire est ailleurs.</span>
-            </p>
+    <div style="
+      text-align:center;
+      padding:4px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    ">
 
-            <canvas id="colorCanvas26" width="900" height="600"
-                style="border:4px solid #bbb; border-radius:8px; box-shadow:0 0 25px #00000022; background:#b5b5b5;">
-            </canvas>
+    <p style="
+      margin:0 0 4px;
+      color:#d8d8ff;
+      font-family:Orbitron,sans-serif;
+      font-size:13px;
+    ">
+      Colorie le dessin avec le pinceau !
+    </p>
 
-            <p id="msg26" style="margin-top:8px; min-height:24px; font-size:1.05em;">
-                Choisis une couleur, trempe le pinceau, puis peins sur le dessin.
-            </p>
-        </div>
+    <canvas
+      id="colorCanvas26"
+      width="${GAME_WIDTH}"
+      height="${GAME_HEIGHT}"
+      style="
+    width:100%;
+    max-width:${GAME_WIDTH}px;
+    height:auto;
+    background:transparent;
+    "
+    </canvas>
+     <p id="msg26" style="display:none;"></p> 
+
+    </div>
     `;
 
     const canvas = container.querySelector("#colorCanvas26");
+    canvas.style.filter =
+  "drop-shadow(0 0 15px rgba(182, 139, 186, 0.5)) drop-shadow(0 0 35px rgba(62, 180, 198, 0.35))";
     const ctx = canvas.getContext("2d");
 
     const maskCanvas = document.createElement("canvas");
@@ -123,18 +152,29 @@ function getCanvasPos26(e) {
 }
 
 function tryPickColor26(x, y) {
-    const paletteY = 520;
+
+    const paletteY = game26.canvas.height - 45;
     const radius = 22;
 
+    const spacing = 80;
+
+    const totalWidth =
+        spacing * (game26.palette.length - 1);
+
+    const startX =
+        (game26.canvas.width - totalWidth) / 2;
+
     for (let i = 0; i < game26.palette.length; i++) {
-        const cx = 140 + i * 110;
+
+        const cx = startX + i * spacing;
         const cy = paletteY;
+
         if (Math.hypot(x - cx, y - cy) <= radius) {
             game26.brushColor = game26.palette[i].color;
-            setMsg26(`Pinceau chargé en ${game26.palette[i].name}.`);
             return true;
         }
     }
+
     return false;
 }
 
@@ -189,13 +229,13 @@ function checkWinCondition26() {
 
     if (ratioOutside > 0.5 && colorsUsed >= 3) {
         game26.gameOver = true;
-        setMsg26("🎉 Tu as gagné… en dépassant partout et avec plein de couleurs. Le coloriage parfait, c'était le chaos.");
+        setMsg26("Tu as gagné… en dépassant partout et avec plein de couleurs. Le coloriage parfait, c'était le chaos.");
         setTimeout(() => game26.onFinish && game26.onFinish(), 1500);
     } else {
         if (colorsUsed < 3) {
             setMsg26("Tu ne dépasses pas assez ou tu n'as pas utilisé assez de couleurs. Ose plus, mélange au moins 3 couleurs.");
         } else {
-            setMsg26("Tu es encore trop sage… dépasse davantage du dessin (au moins 70% de ta peinture doit être hors des lignes).");
+            setMsg26("Dépasse davantage du dessin (au moins 70% de ta peinture doit être hors des lignes).");
         }
     }
 }
@@ -230,7 +270,13 @@ function drawPaperAndOutline26() {
 }
 
 function drawPaper26(ctx) {
-    const x = 80, y = 40, w = 740, h = 430, r = 18;
+    const x = 70;
+    const y = 40;
+
+    const w = game26.canvas.width - 140;
+    const h = game26.canvas.height - 180;
+
+    const r = 18;
 
     ctx.save();
 
@@ -253,6 +299,7 @@ function drawPaper26(ctx) {
     ctx.lineTo(x, y + r);
     ctx.quadraticCurveTo(x, y, x + r, y);
     ctx.closePath();
+
     ctx.fill();
     ctx.stroke();
 
@@ -266,53 +313,77 @@ function drawOutline26(ctx) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    const offsetX = 150;
+    const offsetX = 100;
     const offsetY = 80;
 
-    // Maison
+    // ====================
+    // MAISON
+    // ====================
+
+    // Corps
     ctx.beginPath();
-    ctx.rect(offsetX + 80, offsetY + 140, 200, 160);
-    ctx.moveTo(offsetX + 80, offsetY + 140);
-    ctx.lineTo(offsetX + 180, offsetY + 60);
-    ctx.lineTo(offsetX + 280, offsetY + 140);
+    ctx.rect(offsetX + 70, offsetY + 140, 220, 170);
+    ctx.stroke();
+
+    // Toit
+    ctx.beginPath();
+    ctx.moveTo(offsetX + 40, offsetY + 140);
+    ctx.lineTo(offsetX + 180, offsetY + 35);
+    ctx.lineTo(offsetX + 320, offsetY + 140);
+    ctx.closePath();
     ctx.stroke();
 
     // Porte
     ctx.beginPath();
-    ctx.rect(offsetX + 160, offsetY + 210, 60, 90);
-    ctx.stroke();
-
-    // Fenêtre
-    ctx.beginPath();
-    ctx.rect(offsetX + 220, offsetY + 180, 40, 40);
-    ctx.moveTo(offsetX + 240, offsetY + 180);
-    ctx.lineTo(offsetX + 240, offsetY + 220);
-    ctx.moveTo(offsetX + 220, offsetY + 200);
-    ctx.lineTo(offsetX + 260, offsetY + 200);
-    ctx.stroke();
-
-    // Arbre
-    const ax = offsetX + 360;
-    const ay = offsetY + 180;
-    ctx.beginPath();
-    ctx.rect(ax - 20, ay + 60, 40, 100);
+    ctx.rect(offsetX + 155, offsetY + 220, 50, 90);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(ax, ay, 60, 0, Math.PI * 2);
+    ctx.arc(offsetX + 193, offsetY + 265, 3, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Soleil
-    const sx = offsetX + 380;
-    const sy = offsetY + 40;
+    // Fenêtre gauche
     ctx.beginPath();
-    ctx.arc(sx, sy, 25, 0, Math.PI * 2);
+    ctx.rect(offsetX + 95, offsetY + 180, 45, 45);
+    ctx.moveTo(offsetX + 117, offsetY + 180);
+    ctx.lineTo(offsetX + 117, offsetY + 225);
+    ctx.moveTo(offsetX + 95, offsetY + 202);
+    ctx.lineTo(offsetX + 140, offsetY + 202);
     ctx.stroke();
-    for (let i = 0; i < 8; i++) {
-        const a = (Math.PI * 2 * i) / 8;
+
+    // Fenêtre droite
+    ctx.beginPath();
+    ctx.rect(offsetX + 220, offsetY + 180, 45, 45);
+    ctx.moveTo(offsetX + 242, offsetY + 180);
+    ctx.lineTo(offsetX + 242, offsetY + 225);
+    ctx.moveTo(offsetX + 220, offsetY + 202);
+    ctx.lineTo(offsetX + 265, offsetY + 202);
+    ctx.stroke();
+
+
+    // ====================
+    // SOLEIL
+    // ====================
+
+    const sx = offsetX + 430;
+    const sy = offsetY + 45;
+
+    ctx.beginPath();
+    ctx.arc(sx, sy, 28, 0, Math.PI * 2);
+    ctx.stroke();
+
+    for (let i = 0; i < 12; i++) {
+        const a = (Math.PI * 2 * i) / 12;
+
         ctx.beginPath();
-        ctx.moveTo(sx + Math.cos(a) * 30, sy + Math.sin(a) * 30);
-        ctx.lineTo(sx + Math.cos(a) * 45, sy + Math.sin(a) * 45);
+        ctx.moveTo(
+            sx + Math.cos(a) * 35,
+            sy + Math.sin(a) * 35
+        );
+        ctx.lineTo(
+            sx + Math.cos(a) * 55,
+            sy + Math.sin(a) * 55
+        );
         ctx.stroke();
     }
 
@@ -320,81 +391,106 @@ function drawOutline26(ctx) {
 }
 
 function drawMaskOutline26(maskCtx) {
-    maskCtx.clearRect(0, 0, maskCtx.canvas.width, maskCtx.canvas.height);
-    maskCtx.save();
-    maskCtx.fillStyle = "rgba(0,0,0,1)";
-    maskCtx.strokeStyle = "rgba(0,0,0,1)";
-    maskCtx.lineWidth = 6;
-    maskCtx.lineCap = "round";
-    maskCtx.lineJoin = "round";
 
-    const offsetX = 150;
+    maskCtx.clearRect(
+        0,
+        0,
+        maskCtx.canvas.width,
+        maskCtx.canvas.height
+    );
+
+    maskCtx.save();
+    maskCtx.fillStyle = "black";
+
+    const offsetX = 100;
     const offsetY = 80;
 
-    // Maison remplie
-    maskCtx.beginPath();
-    maskCtx.rect(offsetX + 80, offsetY + 140, 200, 160);
-    maskCtx.fill();
+    // Maison
+    maskCtx.fillRect(
+        offsetX + 70,
+        offsetY + 140,
+        220,
+        170
+    );
 
     maskCtx.beginPath();
-    maskCtx.moveTo(offsetX + 80, offsetY + 140);
-    maskCtx.lineTo(offsetX + 180, offsetY + 60);
-    maskCtx.lineTo(offsetX + 280, offsetY + 140);
+    maskCtx.moveTo(offsetX + 40, offsetY + 140);
+    maskCtx.lineTo(offsetX + 180, offsetY + 35);
+    maskCtx.lineTo(offsetX + 320, offsetY + 140);
     maskCtx.closePath();
     maskCtx.fill();
 
-    // Arbre
-    const ax = offsetX + 360;
-    const ay = offsetY + 180;
-    maskCtx.beginPath();
-    maskCtx.rect(ax - 20, ay + 60, 40, 100);
-    maskCtx.fill();
-
-    maskCtx.beginPath();
-    maskCtx.arc(ax, ay, 60, 0, Math.PI * 2);
-    maskCtx.fill();
-
     // Soleil
-    const sx = offsetX + 380;
-    const sy = offsetY + 40;
+    const sx = offsetX + 430;
+    const sy = offsetY + 45;
+
     maskCtx.beginPath();
-    maskCtx.arc(sx, sy, 25, 0, Math.PI * 2);
+    maskCtx.arc(sx, sy, 28, 0, Math.PI * 2);
     maskCtx.fill();
 
     maskCtx.restore();
 }
-
 /* ---------- PALETTE & PINCEAU ---------- */
 
 function drawPalette26(ctx) {
-    const paletteY = 520;
-    const radius = 22;
+
+    const paletteY = game26.canvas.height - 65;
+    const radius = 18;
+
+    const spacing = 80;
+
+    const totalWidth =
+        spacing * (game26.palette.length - 1);
+
+    const startX =
+        (game26.canvas.width - totalWidth) / 2;
 
     ctx.save();
-    ctx.font = "18px VT323";
-    ctx.textAlign = "left";
+
+    ctx.font = "16px Orbitron";
+    ctx.textAlign = "center";
     ctx.fillStyle = "#333";
-    ctx.fillText("Palette :", 80, paletteY + 6);
+
+    ctx.fillText(
+        " ",
+        game26.canvas.width / 2,
+        paletteY - 35
+    );
 
     for (let i = 0; i < game26.palette.length; i++) {
+
         const color = game26.palette[i].color;
-        const cx = 140 + i * 110;
+
+        const cx = startX + i * spacing;
         const cy = paletteY;
 
         ctx.save();
+
         ctx.shadowColor = "#00000055";
         ctx.shadowBlur = 8;
+
         ctx.fillStyle = color;
+
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fill();
+
         ctx.restore();
 
         if (color === game26.brushColor) {
+
             ctx.strokeStyle = "#000";
             ctx.lineWidth = 3;
+
             ctx.beginPath();
-            ctx.arc(cx, cy, radius + 4, 0, Math.PI * 2);
+            ctx.arc(
+                cx,
+                cy,
+                radius + 4,
+                0,
+                Math.PI * 2
+            );
+
             ctx.stroke();
         }
     }
