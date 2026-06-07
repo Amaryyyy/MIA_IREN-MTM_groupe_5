@@ -5,14 +5,29 @@ let game19 = {};
 
 export function startGame21(container, onFinish) {
     container.innerHTML = `
-        <div style="text-align:center; font-family:'VT323', monospace; color:white;">
-            <h2 style="margin:0 0 10px;">🐜 Tour des Fourmis — Version inversée</h2>
-            <p style="margin:0 0 10px;">Objectif : <br>
-            <span style="color:#afff9f;">Empiler les fourmis avec la plus petite en bas → la plus grande en haut</span></p>
-
-            <canvas id="hanoiCanvas19" width="520" height="300"
+        <div style="text-align:center; font-family:Orbitron,sans-serif; color:white;">
+            <h2 style="
+    margin:0 0 45px;
+    font-size:15px;
+    font-weight:400;
+    color:#f8f8ff;
+">Clique une pile pour prendre une fourmi, puis une autre pour la poser. </h2>
+          <p id="objective19"
+   style="
+      display:none;
+      margin:-3px 0 8px 0;
+      font-family:Orbitron,sans-serif;
+      font-size:15px;
+      color:white;
+   ">
+   Objectif :
+   <span style="color:#ff3860;">
+      Empiler les fourmis avec la plus petite en bas et la plus grande en haut !
+   </span>
+</p>
+            <canvas id="hanoiCanvas19" width="600" height="300"
                 style="
-                    border:4px solid #ff3860;
+                    border:4px solidrgb(247, 138, 160);
                     border-radius:8px;
                     box-shadow:0 0 25px #ff3860aa;
                     cursor:pointer;
@@ -20,7 +35,12 @@ export function startGame21(container, onFinish) {
                 ">
             </canvas>
 
-            <p id="msg19" style="margin-top:10px; min-height:24px; font-size:1.1em;">
+           <p id="msg19" style="
+    margin-top:10px;
+    min-height:24px;
+    font-size:13px;
+    font-family:Orbitron,sans-serif;
+">
                 Clique une pile pour prendre une fourmi, puis une autre pour la poser.
             </p>
         </div>
@@ -34,15 +54,14 @@ export function startGame21(container, onFinish) {
         canvas,
         onFinish,
         selected: null,
-
-        // 1 = petite fourmi, 4 = grosse
-        // 👉 On commence avec la plus petite en bas → la plus grande en haut
+        moves: 0,
+    
         piles: [
             [1, 2, 3, 4],
             [],
             []
         ],
-
+    
         colors: ["#afff9f", "#86eefa", "#f79df8", "#ff3860"]
     };
 
@@ -82,19 +101,18 @@ function moveHanoi19(from, to) {
 
     const ant = pileFrom[pileFrom.length - 1];
 
-    // RÈGLE INVERSÉE :
-    // 👉 On ne peut poser qu'une fourmi PLUS GRANDE sur une PLUS PETITE
-    if (pileTo.length > 0 && pileTo[pileTo.length - 1] < ant) {
-        document.getElementById("msg19").textContent =
-            "❌ Une petite fourmi ne peut pas porter une grosse !";
-        return;
-    }
-
     pileFrom.pop();
     pileTo.push(ant);
 
+    game19.moves++;
+
+    if (game19.moves >= 6) {
+        document.getElementById("objective19").style.display = "block";
+    }
+
     checkWinHanoi19();
 }
+
 
 /* ------------------ WIN ------------------ */
 
@@ -105,7 +123,7 @@ function checkWinHanoi19() {
     for (const pile of game19.piles) {
         if (pile.length === 4 && JSON.stringify(pile) === JSON.stringify(target)) {
             document.getElementById("msg19").textContent =
-                "🎉 Bravo ! La plus petite est bien en bas, et la plus grande en haut !";
+                " Bravo ! La plus petite est bien en bas, et la plus grande en haut !";
             setTimeout(() => game19.onFinish && game19.onFinish(), 1500);
         }
     }
