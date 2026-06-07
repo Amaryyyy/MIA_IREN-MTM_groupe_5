@@ -6,15 +6,25 @@ export function startGame35(container, onFinish) {
   if (!container) return;
   container.innerHTML = "";
 
-  const title = createGameTitle(" Labyrinthe Neural");
-  container.appendChild(title);
 
   const hud = document.createElement("div");
-  hud.style.color = "#94a3b8";
+
+  hud.style.color = "#d8d8ff";
   hud.style.textAlign = "center";
+  
+  hud.style.marginTop = "25px";
   hud.style.marginBottom = "10px";
-  hud.innerHTML = "Trouve la sortie… mais tout n’est pas logique.";
+  
+  hud.style.fontFamily = "Orbitron, sans-serif";
+  hud.style.fontSize = "13px";
+  hud.style.textShadow =
+    "0 0 8px rgba(120,180,255,0.45)";
+  
+  hud.innerHTML = "Trouve la sortie…";
+  
   container.appendChild(hud);
+
+container.appendChild(hud);
 
   // VARIABLES AVANT UTILISATION
   const cols = 25;
