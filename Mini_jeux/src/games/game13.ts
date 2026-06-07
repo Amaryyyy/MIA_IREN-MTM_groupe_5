@@ -584,12 +584,9 @@ canvas.style.boxShadow = `
   // =========================
   // END
   // =========================
-  function endGame(msg) {
-
-    alert(msg);
-
+  function endGame() {
     onFinish && onFinish();
-  }
+}
 
   // =========================
   // START
