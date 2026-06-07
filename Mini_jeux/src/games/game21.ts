@@ -13,7 +13,7 @@ container.innerHTML = `
         font-weight:400;
         color:#f8f8ff;
     ">
-        Clique une pile pour prendre une fourmi, puis une autre pour la poser.
+        
     </h2>
 
     <p id="hint19"
