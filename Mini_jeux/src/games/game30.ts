@@ -120,15 +120,15 @@ export function startGame10(container, onFinish) {
 
     if (userInput === expected) {
       if (currentLevel === levels.length - 1) {
-        setFeedback(feedback, true, "🎉 Tu as trouvé la dernière règle cachée !");
+        setFeedback(feedback, true, "Tu as trouvé la règle cachée !");
         setTimeout(() => {
-          alert("Wow ! Pattern Breaker complété 🎉");
+          alert("Wow ! Pattern Breaker complété ");
           onFinish();
         }, 250);
         return;
       }
 
-      setFeedback(feedback, true, "✅ Correct ! Niveau suivant...");
+      setFeedback(feedback, true, "Correct ! Game suivant...");
       currentLevel++;
 
       setTimeout(() => {
