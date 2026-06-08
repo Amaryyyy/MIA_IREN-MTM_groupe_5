@@ -70,22 +70,22 @@ export function startGame10(container, onFinish) {
 
     input.focus();
   }
-
+  
   function showProgressHint() {
-    if (attempts === 2) {
-      setFeedback(feedback, false, `Indice : ${levels[currentLevel].hint}`);
-    } else if (attempts === 4) {
-      setFeedback(feedback, false, "Un autre indice : relis bien l'énoncé, ce n'est pas toujours la même règle.");
-    } else {
-      const messages = [
+    const messages = [
         "✗ Essaie encore.",
         "✗ Tiens bon, c'est intéressant !",
         "✗ Petit effort de plus...",
         "✗ Là c'est le moment d'un gros break mental."
-      ];
-      setFeedback(feedback, false, messages[Math.min(attempts - 1, messages.length - 1)]);
-    }
-  }
+    ];
+
+    setFeedback(
+        feedback,
+        false,
+        messages[Math.min(attempts - 1, messages.length - 1)]
+    );
+}
+
 
   function checkAnswer() {
     const userInput = input.value.trim().toLowerCase();
