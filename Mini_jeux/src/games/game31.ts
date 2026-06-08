@@ -77,9 +77,9 @@ export function startGame31(container, onFinish) {
   }
 
   function showProgressHint() {
-    if (attempts === 2) {
+    if (attempts === 10) {
       setFeedback(feedback, false, `Indice : ${levels[currentLevel].hint}`);
-    } else if (attempts === 4) {
+    } else if (attempts === 10) {
       setFeedback(feedback, false, "Un autre indice : relis bien l'énoncé, ce n'est pas toujours la même règle.");
     } else {
       const messages = [
@@ -87,9 +87,13 @@ export function startGame31(container, onFinish) {
         "✗ Tiens bon, c'est intéressant !",
         "✗ Petit effort de plus...",
         "✗ Là c'est le moment d'un gros break mental."
-      ];
-      setFeedback(feedback, false, messages[Math.min(attempts - 1, messages.length - 1)]);
-    }
+    ];
+    
+    setFeedback(
+        feedback,
+        false,
+        messages[(attempts - 1) % messages.length]
+    );}
   }
 
   function checkAnswer() {
@@ -110,11 +114,11 @@ export function startGame31(container, onFinish) {
     }
   
     if (userInput === expected) {
-      setFeedback(feedback, true, " Tu as trouvé la règle cachée !");
+      setFeedback(feedback, true, " ✓ Tu as trouvé la règle cachée !");
   
       setTimeout(() => {
         onFinish();
-      }, 250);
+      }, 800);
   
       return;
     }
