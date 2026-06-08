@@ -13,6 +13,7 @@ interface PlayAreaProps {
 export default function PlayArea({
   currentLevel,
   onNext,
+  onPrevious,
   onLevelComplete,
 }: PlayAreaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +86,9 @@ export default function PlayArea({
     };
   }, [currentLevel, levels.length, onLevelComplete, onNext]);
 
+  const _showPrevious = currentLevel > 0;
+  const _showNext = !finished && currentLevel < levels.length - 1;
+
   return (
     <section className="play-area">
       <h2 className="level-title">{levelTitle}</h2>
@@ -92,6 +96,9 @@ export default function PlayArea({
         <p className="score-toast">+{lastScore} points enregistrés !</p>
       )}
       <div ref={containerRef} id="gameContainer" className="game-container" />
+      <div className="nav-buttons">
+        <button onClick={onPrevious}>🏠 Accueil</button>
+      </div>
     </section>
   );
 }
