@@ -90,33 +90,24 @@ export function startGame27(container, onFinish) {
   function checkAnswer() {
     const userInput = input.value.trim().toLowerCase();
     const expected = levels[currentLevel].answer.trim().toLowerCase();
-
+  
     attempts++;
-
+  
     if (userInput === "") {
       setFeedback(feedback, false, "Tu dois saisir une réponse.");
       return;
     }
-
+  
     if (userInput === expected) {
-      if (currentLevel === levels.length - 1) {
-        setFeedback(feedback, true, "🎉 Tu as trouvé la dernière règle cachée !");
-        setTimeout(() => {
-          alert("Wow ! Pattern Breaker complété 🎉");
-          onFinish();
-        }, 250);
-        return;
-      }
-
-      setFeedback(feedback, true, "✅ Correct ! Niveau suivant...");
-      currentLevel++;
-
+      setFeedback(feedback, true, "Tu as trouvé la règle cachée !");
+  
       setTimeout(() => {
-        loadLevel();
-      }, 500);
+        onFinish();
+      }, 250);
+  
       return;
     }
-
+  
     showProgressHint();
   }
 
