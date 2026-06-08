@@ -84,6 +84,8 @@ const WORLD_HEIGHT = canvas.height;
   let smallTime = 0;
   const requiredSmallTime = 20;
 
+  let gameEnded = false;
+
   const keys = {};
 
   // =========================
@@ -245,19 +247,27 @@ const WORLD_HEIGHT = canvas.height;
       endGame("Trop gros !");
     }
 
-    // WIN CONDITION
-    if (player.size <= 10) {
-      smallTime += 1 / 60;
-    } else {
-      smallTime = 0;
-    }
-
-    if (smallTime >= requiredSmallTime) {
-      endGame(
-        "Tu es resté petit 20s !"
-      );
-    }
+  // WIN CONDITION
+  if (player.size <= 10) {
+    smallTime += 1 / 60;
+  } else {
+    smallTime = 0;
   }
+
+  if (
+    smallTime >= requiredSmallTime &&
+    !gameEnded
+  ) {
+    gameEnded = true;
+
+    gameManager.addTimeout(
+      setTimeout(() => {
+        gameManager.cleanup();
+        onFinish();
+      }, 1800)
+    );
+  }
+}
 
   // =========================
   // DRAW
@@ -357,6 +367,32 @@ const WORLD_HEIGHT = canvas.height;
       10,
       25
     );
+
+    if (gameEnded) {
+
+      ctx.fillStyle = "#22c55e";
+    
+      ctx.font = "bold 28px Orbitron";
+    
+      ctx.textAlign = "center";
+    
+      ctx.shadowColor = "#22c55e";
+      ctx.shadowBlur = 20;
+    
+      ctx.fillText(
+        " Bravo !",
+        WORLD_WIDTH / 2,
+        WORLD_HEIGHT / 2 - 15
+      );
+    
+      ctx.fillText(
+        "Tu es resté petit 20 secondes !",
+        WORLD_WIDTH / 2,
+        WORLD_HEIGHT / 2 + 25
+      );
+    
+      ctx.shadowBlur = 0;
+    }
   }
 
   // =========================
@@ -376,24 +412,11 @@ const WORLD_HEIGHT = canvas.height;
   // =========================
   // END GAME
   // =========================
-  function endGame(message) {
-
-    gameManager.addTimeout(
-      setTimeout(() => {
-
-        if (gameManager.isRunning) {
-
-          gameManager.cleanup();
-
-          alert(message);
-
-          onFinish();
-        }
-
-      }, 100)
-    );
+  function endGame() {
+    gameManager.cleanup();
+    onFinish();
   }
-
+  
   // =========================
   // START
   // =========================
