@@ -21,7 +21,6 @@ export function startGame23(container, onFinish) {
     const centerY = canvas.height / 2 - 40;
     const centerX = canvas.width / 2;
 
-    // Plateau linéaire : 3 dominos à gauche, 3 à droite, tous collés
     const slotSpacing = 120;
     const dominoWidth = 80;
     const dominoHeight = 40;
@@ -38,16 +37,10 @@ export function startGame23(container, onFinish) {
         { id: "R3", x: centerX + slotSpacing * 3, y: centerY, direction: "right", parent: "R2", occupied: false }
     ];
 
-    // Domino central fixé : 2|1
     const boardDominos = [
         { slotId: "center", left: 2, right: 1 }
     ];
 
-    // Puzzle à solution unique : ces 6 dominos ont une place précise
-    // Chaîne à droite (direction "right", on compare les extrémités opposées) :
-    // center 2|1 → R1 3|2 → R2 4|3 → R3 5|4
-    // Chaîne à gauche (direction "left") :
-    // center 2|1 → L1 1|6 → L2 6|0 → L3 0|5
     const pool = [
         { left: 3, right: 2 }, // R1
         { left: 4, right: 3 }, // R2
@@ -55,10 +48,9 @@ export function startGame23(container, onFinish) {
         { left: 1, right: 6 }, // L1
         { left: 6, right: 0 }, // L2
         { left: 0, right: 5 }, // L3
-        { left: 5, right: 5 }   // Piège : ne correspond à aucune extrémité utile
+        { left: 5, right: 5 }  // Piège
     ];
 
-    // Réserve en bas
     const poolLayout = pool.map((d, i) => ({
         x: 80 + i * 120,
         y: canvas.height - 70,
@@ -78,8 +70,6 @@ export function startGame23(container, onFinish) {
         isDragging: false,
         dragX: 0,
         dragY: 0,
-        dragOffsetX: 0,
-        dragOffsetY: 0,
         messageTimer: null,
         gameOver: false,
         dominoWidth,
@@ -115,14 +105,14 @@ function canPlaceDomino21(domino, slot) {
     if (!parentDomino) return false;
 
     if (slot.direction === "right") {
-        const parentOpp = parentDomino.left;  // côté opposé à la droite
-        const newOpp = domino.right;          // côté opposé au point de contact (gauche)
+        const parentOpp = parentDomino.left;
+        const newOpp = domino.right;
         return parentOpp === newOpp;
     }
 
     if (slot.direction === "left") {
-        const parentOpp = parentDomino.right; // côté opposé à la gauche
-        const newOpp = domino.left;           // côté opposé au point de contact (droite)
+        const parentOpp = parentDomino.right;
+        const newOpp = domino.left;
         return parentOpp === newOpp;
     }
 
@@ -140,11 +130,17 @@ function getCanvasPoint21(e) {
 }
 
 function findPoolIndexAt21(x, y) {
+    const margin = 12; // hitbox élargie
     for (let i = 0; i < game21.poolLayout.length; i++) {
         const pl = game21.poolLayout[i];
         const domino = game21.pool[i];
         if (!domino) continue;
-        if (x >= pl.x && x <= pl.x + pl.w && y >= pl.y && y <= pl.y + pl.h) {
+        if (
+            x >= pl.x - margin &&
+            x <= pl.x + pl.w + margin &&
+            y >= pl.y - margin &&
+            y <= pl.y + pl.h + margin
+        ) {
             return i;
         }
     }
@@ -152,13 +148,11 @@ function findPoolIndexAt21(x, y) {
 }
 
 function startDragFromPoolIndex21(index, x, y) {
-    const pl = game21.poolLayout[index];
     game21.selectedPoolIndex = index;
     game21.isDragging = true;
     game21.dragX = x;
     game21.dragY = y;
-    game21.dragOffsetX = x - (pl.x + pl.w / 2);
-    game21.dragOffsetY = y - (pl.y + pl.h / 2);
+    game21.canvas.style.cursor = "grabbing";
     setMsg21("Glisse le domino vers un emplacement vide puis relâche.");
     render21();
 }
@@ -170,8 +164,9 @@ function onCanvasMouseDown21(e) {
     const index = findPoolIndexAt21(x, y);
 
     if (index == null) {
-        if (game21.selectedPoolIndex == null) return;
         game21.isDragging = false;
+        game21.selectedPoolIndex = null;
+        game21.canvas.style.cursor = "grab";
         return;
     }
 
@@ -189,8 +184,10 @@ function onCanvasMouseMove21(e) {
 
 function onCanvasMouseUp21(e) {
     if (game21.gameOver) return;
+
     if (game21.selectedPoolIndex == null) {
         game21.isDragging = false;
+        game21.canvas.style.cursor = "grab";
         return;
     }
 
@@ -199,6 +196,8 @@ function onCanvasMouseUp21(e) {
 
     if (!slot) {
         game21.isDragging = false;
+        game21.selectedPoolIndex = null;
+        game21.canvas.style.cursor = "grab";
         render21();
         return;
     }
@@ -208,6 +207,8 @@ function onCanvasMouseUp21(e) {
     if (!canPlaceDomino21(domino, slot)) {
         setMsg21("❌ Mauvais domino pour cet emplacement", 220);
         game21.isDragging = false;
+        game21.selectedPoolIndex = null;
+        game21.canvas.style.cursor = "grab";
         render21();
         return;
     }
@@ -221,6 +222,7 @@ function onCanvasMouseUp21(e) {
     game21.pool[game21.selectedPoolIndex] = null;
     game21.selectedPoolIndex = null;
     game21.isDragging = false;
+    game21.canvas.style.cursor = "grab";
 
     if (checkWin21()) {
         endGame21(true);
@@ -260,7 +262,7 @@ function nearestEmptySlot21(x, y) {
         const dx = x - s.x;
         const dy = y - s.y;
         const d = dx * dx + dy * dy;
-        if (d < bestDist && d < 72 * 72) {
+        if (d < bestDist && d < 80 * 80) {
             bestDist = d;
             best = s;
         }
@@ -271,7 +273,6 @@ function nearestEmptySlot21(x, y) {
 /* ---------- VICTOIRE ---------- */
 
 function checkWin21() {
-    // Tous les slots doivent être occupés
     return game21.slots.every(s => s.occupied);
 }
 
@@ -284,7 +285,7 @@ function render21() {
     ctx.fillStyle = "#06202a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Slots (emplacements)
+    // Slots
     for (const s of game21.slots) {
         if (s.id === "center") continue;
         ctx.save();
@@ -349,8 +350,8 @@ function render21() {
         const domino = game21.pool[game21.selectedPoolIndex];
         const pl = game21.poolLayout[game21.selectedPoolIndex];
         ctx.save();
-        ctx.globalAlpha = 0.92;
-        ctx.translate(game21.dragX - game21.dragOffsetX, game21.dragY - game21.dragOffsetY);
+        ctx.globalAlpha = 0.95;
+        ctx.translate(game21.dragX, game21.dragY);
         drawDomino21(
             ctx,
             -pl.w / 2,

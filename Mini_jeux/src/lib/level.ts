@@ -122,12 +122,6 @@ const levels: Level[] = [
 { game: "game37", difficulty: "hard", title: "Neo Snake" },
 
 //41
-{ game: "game30", difficulty: "hard", title: "The Unpattern" },
-
-//42
-{ game: "game11", difficulty: "hard", title: "Digital Dawn" },
-
-//43
 { game: "TransitionEnd", difficulty: "end", title: "Fin du Jeu" },
 
 

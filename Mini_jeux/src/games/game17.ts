@@ -125,7 +125,7 @@ function moveTile(x, y) {
         toX: endX,
         toY: endY,
         start: performance.now(),
-        duration: 90
+        duration: 40 // <<< ACCÉLÉRATION DE L'ANIMATION (90 → 40)
     };
 
     requestAnimationFrame(stepTaquinAnimation);

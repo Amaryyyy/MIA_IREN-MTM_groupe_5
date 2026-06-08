@@ -101,18 +101,6 @@ export default function PlayArea({
         <p className="score-toast">+{lastScore} points enregistrés !</p>
       )}
       <div ref={containerRef} id="gameContainer" className="game-container" />
-      <div className="nav-controls">
-        {showPrevious && (
-          <button type="button" onClick={onPrevious}>
-            Precedent
-          </button>
-        )}
-        {showNext && (
-          <button type="button" onClick={handleSkip}>
-            Passer
-          </button>
-        )}
-      </div>
     </section>
   );
 }
