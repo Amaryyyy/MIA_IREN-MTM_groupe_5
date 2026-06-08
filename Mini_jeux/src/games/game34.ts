@@ -98,11 +98,12 @@ export function startGame34(container, onFinish) {
     }
 
     if (userInput === expected) {
-      setFeedback(feedback, true, "🎉 Tu as trouvé la dernière règle cachée !");
+      setFeedback(feedback, true, "Tu as trouvé la dernière règle cachée !");
+      
       setTimeout(() => {
-        alert("Wow ! Pattern Breaker complété 🎉");
         onFinish();
       }, 250);
+    
       return;
     }
 
