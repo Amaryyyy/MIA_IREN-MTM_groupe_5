@@ -72,10 +72,10 @@ export function startGame28(container, onFinish) {
   }
 
   function showProgressHint() {
-    if (attempts === 2) {
-      setFeedback(feedback, false, `Indice : ${levels[currentLevel].hint}`);
-    } else if (attempts === 4) {
-      setFeedback(feedback, false, "Un autre indice : relis bien l'énoncé, ce n'est pas toujours la même règle.");
+    if (attempts === 5) {
+      setFeedback(feedback, false, `💡 Indice : convertis les lettres en positions dans l'alphabet !`);
+    } else if (attempts === 8) {
+      setFeedback(feedback, false, "💡 Un autre indice : les écarts augmentent progressivement !");
     } else {
       const messages = [
         "✗ Essaie encore.",
@@ -83,9 +83,14 @@ export function startGame28(container, onFinish) {
         "✗ Petit effort de plus...",
         "✗ Là c'est le moment d'un gros break mental."
       ];
-      setFeedback(feedback, false, messages[Math.min(attempts - 1, messages.length - 1)]);
+
+      setFeedback(
+        feedback,
+        false,
+        messages[(attempts - 1) % messages.length]
+      );
     }
-  }
+}
 
   function checkAnswer() {
     const userInput = input.value.trim().toLowerCase();
