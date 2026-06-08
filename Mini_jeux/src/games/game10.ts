@@ -79,34 +79,31 @@ question.style.textShadow = "0 0 10px #ffcc00, 0 0 20px #ff9900";
 
   function checkAnswer() {
     const userInput = input.value.trim().toLowerCase();
-    const expected = levels[currentLevel].answer.trim().toLowerCase();
-
+    const current = levels[currentLevel];
+  
+    if (!current || typeof current.answer !== "string") {
+      setFeedback(feedback, false, "Erreur: réponse du niveau introuvable.");
+      return;
+    }
+  
+    const expected = current.answer.trim().toLowerCase();
     attempts++;
-
+  
     if (userInput === "") {
       setFeedback(feedback, false, "Tu dois saisir une réponse.");
       return;
     }
-
+  
     if (userInput === expected) {
-      if (currentLevel === levels.length - 1) {
-        setFeedback(feedback, true, "🎉 Tu as trouvé la dernière règle cachée !");
-        setTimeout(() => {
-          alert("Wow ! Pattern Breaker complété 🎉");
-          onFinish();
-        }, 250);
-        return;
-      }
-
-      setFeedback(feedback, true, "✅ Correct ! Niveau suivant...");
-      currentLevel++;
-
+      setFeedback(feedback, true, "Tu as trouvé la règle cachée !");
+  
       setTimeout(() => {
-        loadLevel();
-      }, 500);
+        onFinish();
+      }, 250);
+  
       return;
     }
-
+  
     showProgressHint();
   }
 
