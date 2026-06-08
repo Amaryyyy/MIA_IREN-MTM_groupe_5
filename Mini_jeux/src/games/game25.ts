@@ -125,7 +125,9 @@ for (let c = 0; c < 3; c++) {
         draggingIndex: null,
         dragOffsetX: 0,
         dragOffsetY: 0,
-        gameOver: false
+        gameOver: false,
+        renderPending: false,
+        
     };
 
     canvas.addEventListener("mousedown", onMouseDown23);
@@ -136,7 +138,14 @@ for (let c = 0; c < 3; c++) {
 
     resizeCanvas23();
 
-    render23();
+    if (!game23.renderPending) {
+        game23.renderPending = true;
+    
+        requestAnimationFrame(() => {
+            game23.renderPending = false;
+            render23();
+        });
+    }
 }
 
 /* ---------- INPUT ---------- */
@@ -157,7 +166,11 @@ function onMouseDown23(e) {
             game23.dragOffsetX = x - p.x;
             game23.dragOffsetY = y - p.y;
             game23.pieces.push(game23.pieces.splice(i, 1)[0]);
-            render23();
+            cancelAnimationFrame(game23.raf);
+
+game23.raf = requestAnimationFrame(() => {
+    render23();
+});
             return;
         }
     }
@@ -271,7 +284,7 @@ function drawIceBoard23(ctx, board) {
 
     ctx.save();
     ctx.shadowColor = "#7df9ff55";
-    ctx.shadowBlur = 40;
+    ctx.shadowBlur = 10;
 
     const glass = ctx.createLinearGradient(x, y, x, y + size);
     glass.addColorStop(0, "rgba(120,180,255,0.25)");
