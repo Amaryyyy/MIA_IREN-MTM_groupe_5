@@ -9,7 +9,7 @@ export function startGame25(container, onFinish) {
             
             <p style="margin:0 0 8px; font-size:0.95em;">
 
-            <canvas id="shapeCanvas23" width="900" height="650"
+            <canvas id="shapeCanvas23" width="900" height="500"
                 style="border-radius:8px; background:transparent; display:block; max-width:100%; height:auto;">
             </canvas>
 
@@ -66,21 +66,53 @@ export function startGame25(container, onFinish) {
 
     /* ---------- PIÈCES (FORMES 3D NÉON) ---------- */
     const pieceSize = 90;
-    const shapes = ["circle","triangle","hex","drop","cross","diamond"];
-    const colorKeys = ["cyan","magenta","lime","violet","orange","pink"];
-    const pieces = [];
-    const cols = 3;
-    const hGap = (board.size - cols * pieceSize) / (cols + 1);
-    const startX = board.x + hGap;
-    const row1Y = board.y + board.size - 40; // slightly overlapping the board for visual balance
-    const row2Y = row1Y + pieceSize + 10;
+const shapes = ["circle","triangle","hex","drop","cross","diamond"];
+const colorKeys = ["cyan","magenta","lime","violet","orange","pink"];
 
-    for (let c = 0; c < cols; c++) {
-        const x1 = Math.round(startX + c * (pieceSize + hGap));
-        const x2 = x1; // same columns for second row
-        pieces.push({ id: `P${c + 1}`, shape: shapes[c], colorKey: colorKeys[c], x: x1, y: row1Y, w: pieceSize, h: pieceSize, homeX: x1, homeY: row1Y, slotId: null });
-        pieces.push({ id: `P${c + 4}`, shape: shapes[c + 3], colorKey: colorKeys[c + 3], x: x2, y: row2Y, w: pieceSize, h: pieceSize, homeX: x2, homeY: row2Y, slotId: null });
-    }
+const pieces = [];
+
+// 3 à gauche
+const leftX = board.x - 150;
+
+// 3 à droite
+const rightX = board.x + board.size + 60;
+
+const startY = board.y + 40;
+const gapY = 110;
+
+
+for (let c = 0; c < 3; c++) {
+
+    const y = board.y + 40 + c * 110;
+
+    // Gauche
+    pieces.push({
+        id: `P${c + 1}`,
+        shape: shapes[c],
+        colorKey: colorKeys[c],
+        x: leftX,
+        y,
+        w: pieceSize,
+        h: pieceSize,
+        homeX: leftX,
+        homeY: y,
+        slotId: null
+    });
+
+    // Droite
+    pieces.push({
+        id: `P${c + 4}`,
+        shape: shapes[c + 3],
+        colorKey: colorKeys[c + 3],
+        x: rightX,
+        y,
+        w: pieceSize,
+        h: pieceSize,
+        homeX: rightX,
+        homeY: y,
+        slotId: null
+    });
+}
 
     game23 = {
         ctx,
@@ -354,6 +386,6 @@ function setMsg23(text) {
 
 function endGame23() {
     game23.gameOver = true;
-    setMsg23("🎉 Puzzle terminé ! Tu as suivi la couleur, pas la forme.");
+    setMsg23(" Puzzle terminé ! Tu as suivi la couleur, pas la forme.");
     setTimeout(() => game23.onFinish && game23.onFinish(), 1500);
 }
