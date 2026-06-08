@@ -4,9 +4,9 @@ import { createInputField, createValidationButton, createFeedbackDiv, setFeedbac
 export function startGame34(container, onFinish) {
   const levels = [
     {
-      question: "Dernier niveau : il n'y a pas de logique !",
-      answer: "il n'y a pas de logique",
-      hint: "Fais confiance à ton intuition finale."
+      question: "R E V E G A M S E",
+      answer: "gameverse",
+      hint: "Les lettres forment le nom du jeu."
     }
   ];
 
@@ -71,19 +71,37 @@ export function startGame34(container, onFinish) {
   }
 
   function showProgressHint() {
-    if (attempts === 2) {
-      setFeedback(feedback, false, `Indice : ${levels[currentLevel].hint}`);
-    } else if (attempts === 4) {
-      setFeedback(feedback, false, "Un autre indice : relis bien l'énoncé, ce n'est pas toujours la même règle.");
-    } else {
-      const messages = [
-        "✗ Essaie encore.",
-        "✗ Tiens bon, c'est intéressant !",
-        "✗ Petit effort de plus...",
-        "✗ Là c'est le moment d'un gros break mental."
-      ];
-      setFeedback(feedback, false, messages[Math.min(attempts - 1, messages.length - 1)]);
+
+    if (attempts === 5) {
+      setFeedback(
+        feedback,
+        false,
+        "💡 Indice : toutes les lettres sont utiles."
+      );
+      return;
     }
+  
+    if (attempts === 8) {
+      setFeedback(
+        feedback,
+        false,
+        "💡 Indice : elles forment le nom de cette plateforme."
+      );
+      return;
+    }
+  
+    const messages = [
+      "✗ Essaie encore.",
+      "✗ Tiens bon, c'est intéressant !",
+      "✗ Petit effort de plus...",
+      "✗ Là c'est le moment d'un gros break mental."
+    ];
+  
+    setFeedback(
+      feedback,
+      false,
+      messages[(attempts - 1) % messages.length]
+    );
   }
 
   function checkAnswer() {
@@ -98,11 +116,15 @@ export function startGame34(container, onFinish) {
     }
 
     if (userInput === expected) {
-      setFeedback(feedback, true, "Tu as trouvé la dernière règle cachée !");
-      
+      setFeedback(
+        feedback,
+        true,
+        "Tu as trouvé le mot caché !"
+      );
+    
       setTimeout(() => {
         onFinish();
-      }, 250);
+      }, 900);
     
       return;
     }
