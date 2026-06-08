@@ -122,7 +122,7 @@ function checkPizzaWin() {
 
             if (ratio > 0.8) {
                 document.getElementById("pizzaMsg").textContent =
-                    "❌ Deux parts sont trop similaires ! Réessayez…";
+                    "Deux parts sont trop similaires ! Réessayez…";
 
                 pizzaGame.status = "LOSE";
                 gameManager.addTimeout(setTimeout(() => startGame38(pizzaGame.container, pizzaGame.onFinish), 1500));
@@ -132,7 +132,7 @@ function checkPizzaWin() {
     }
 
     document.getElementById("pizzaMsg").textContent =
-        "🔥 Bravo ! Ta diavola est coupée en parts bien différentes !";
+        " Bravo ! Ta diavola est coupée en parts bien différentes !";
 
     pizzaGame.status = "WIN";
     gameManager.addTimeout(setTimeout(pizzaGame.onFinish, 1500));
