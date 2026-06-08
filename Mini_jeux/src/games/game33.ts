@@ -5,9 +5,9 @@ import { gameManager } from "@/lib/gameCleanup";
 export function startGame10(container, onFinish) {
   const levels = [
     {
-      question: "5, 10, 20, ?",
-      answer: "je ne sais pas",
-      hint: "Meta : le jeu a changé les règles, réponds honnêtement."
+      question: "1, 2, 6, ?",
+      answer: "24",
+      hint: "Chaque terme dépend du précédent."
     }
   ];
 
@@ -99,21 +99,21 @@ export function startGame10(container, onFinish) {
     }
 
     if (userInput === expected) {
-      if (currentLevel === levels.length - 1) {
-        setFeedback(feedback, true, "🎉 Tu as trouvé la dernière règle cachée !");
-        setTimeout(() => {
-          alert("Wow ! Pattern Breaker complété 🎉");
-          onFinish();
-        }, 250);
-        return;
-      }
+      setFeedback(feedback, true, " Tu as trouvé la dernière règle cachée !");
+      
+      setTimeout(() => {
+        onFinish();
+      }, 250);
+    
+      return;
+    }
 
-      setFeedback(feedback, true, "✅ Correct ! Niveau suivant...");
+      setFeedback(feedback, true, "Correct ! Game suivant...");
       currentLevel++;
 
       setTimeout(loadLevel, 500);
       return;
-    }
+    
 
     showProgressHint();
   }
