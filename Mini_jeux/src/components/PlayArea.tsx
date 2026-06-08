@@ -85,14 +85,6 @@ export default function PlayArea({
     };
   }, [currentLevel, levels.length, onLevelComplete, onNext]);
 
-  const handleSkip = () => {
-    attemptsRef.current += 1;
-    onNext();
-  };
-
-  const showPrevious = currentLevel > 0;
-  const showNext = !finished && currentLevel < levels.length - 1;
-
   return (
     <section className="play-area">
       <h2 className="level-title">{levelTitle}</h2>
