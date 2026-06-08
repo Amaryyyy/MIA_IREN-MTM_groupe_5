@@ -168,9 +168,17 @@ export function startGame36(container, onFinish) {
   }
 
   function win() {
-    gameManager.cleanup();
-    setFeedback(feedbackDiv, true,  "Bien joué… tu as perdu !");
-    gameManager.addTimeout(setTimeout(onFinish, 1200));
+
+    setFeedback(
+      feedbackDiv,
+      true,
+      "Bien joué… tu as perdu !"
+    );
+  
+    setTimeout(() => {
+      gameManager.cleanup();
+      onFinish();
+    }, 1200);
   }
 
   function loop() {
