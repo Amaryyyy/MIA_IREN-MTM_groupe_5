@@ -68,7 +68,7 @@ const levels: Level[] = [
 { game: "game36", difficulty: "hard", title: "Pac Trap" },
 
 //23
-{ game: "game33", difficulty: "hard", title: "Retro Descent" },
+{ game: "game33", difficulty: "hard", title: "Retro Sequence" },
 
 //24
 { game: "game24", difficulty: "hard", title: "Framework Frenzy" },
@@ -126,6 +126,8 @@ const levels: Level[] = [
 
 //42
 { game: "TransitionEnd", difficulty: "end", title: "Fin du Jeu" },
+
+
 
 ];
 
