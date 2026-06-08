@@ -5,9 +5,9 @@ import { gameManager } from "@/lib/gameCleanup";
 export function startGame10(container, onFinish) {
   const levels = [
     {
-      question: "2, 4, 8, 16, ?",
-      answer: "?",
-      hint: "Cette fois on brise le pattern : double → rupture. Réponse attendue exacte ' ? '."
+      question: "U, O, I, E, ?",
+      answer: "A",
+      hint: "Ce sont toutes des voyelles."
     }
   ];
 
@@ -72,6 +72,25 @@ export function startGame10(container, onFinish) {
   }
   
   function showProgressHint() {
+
+    if (attempts === 5) {
+        setFeedback(
+            feedback,
+            false,
+            "💡 Indice : pense aux voyelles."
+        );
+        return;
+    }
+
+    if (attempts === 8) {
+        setFeedback(
+            feedback,
+            false,
+            "💡 Un autre indice : elles sont dans l'ordre inverse."
+        );
+        return;
+    }
+
     const messages = [
         "✗ Essaie encore.",
         "✗ Tiens bon, c'est intéressant !",
@@ -82,7 +101,7 @@ export function startGame10(container, onFinish) {
     setFeedback(
         feedback,
         false,
-        messages[Math.min(attempts - 1, messages.length - 1)]
+        messages[(attempts - 1) % messages.length]
     );
 }
 
@@ -102,7 +121,20 @@ export function startGame10(container, onFinish) {
       if (currentLevel === levels.length - 1) {
         setFeedback(feedback, true, "Tu as trouvé la règle cachée !");
         setTimeout(() => {
-          alert("Wow ! Pattern Breaker complété ");
+          if (userInput === expected) {
+
+            setFeedback(
+                feedback,
+                true,
+                "✓ Tu as trouvé la règle cachée !"
+            );
+        
+            setTimeout(() => {
+                onFinish();
+            }, 1500);
+        
+            return;
+        }
           onFinish();
         }, 250);
         return;
