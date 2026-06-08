@@ -62,20 +62,29 @@ question.style.textShadow = "0 0 10px #ffcc00, 0 0 20px #ff9900";
   }
 
   function showProgressHint() {
-    if (attempts === 2) {
-      setFeedback(feedback, false, `Indice : ${levels[currentLevel].hint}`);
-    } else if (attempts === 4) {
-      setFeedback(feedback, false, "Un autre indice : relis bien l'énoncé, ce n'est pas toujours la même règle.");
-    } else {
-      const messages = [
+
+    if (attempts === 5) {
+        setFeedback(
+            feedback,
+            false,
+            "Indice : chaque nombre est multiplié par 2."
+        );
+        return;
+    }
+
+    const messages = [
         "✗ Essaie encore.",
         "✗ Tiens bon, c'est intéressant !",
         "✗ Petit effort de plus...",
         "✗ Là c'est le moment d'un gros break mental."
-      ];
-      setFeedback(feedback, false, messages[Math.min(attempts - 1, messages.length - 1)]);
-    }
-  }
+    ];
+
+    setFeedback(
+        feedback,
+        false,
+        messages[(attempts - 1) % messages.length]
+    );
+}
 
   function checkAnswer() {
     const userInput = input.value.trim().toLowerCase();
@@ -95,12 +104,12 @@ question.style.textShadow = "0 0 10px #ffcc00, 0 0 20px #ff9900";
     }
   
     if (userInput === expected) {
-      setFeedback(feedback, true, "Tu as trouvé la règle cachée !");
-  
+      setFeedback(feedback, true, "✓ Bien joué ! ");
+    
       setTimeout(() => {
         onFinish();
-      }, 250);
-  
+      }, 1500);
+    
       return;
     }
   
