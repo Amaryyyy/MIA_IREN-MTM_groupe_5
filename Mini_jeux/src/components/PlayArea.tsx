@@ -13,7 +13,6 @@ interface PlayAreaProps {
 export default function PlayArea({
   currentLevel,
   onNext,
-  onPrevious,
   onLevelComplete,
 }: PlayAreaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
