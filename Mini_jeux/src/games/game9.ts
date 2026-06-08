@@ -42,11 +42,25 @@ export function startGame9(container, onFinish) {
       }
     });
     
-    // Afficher l'alerte après la révélation
-    setTimeout(() => {
-      alert("Bravo, vous avez gagné !\nLes cartes avec la lueur rouge sont les intrus 😏");
-      onFinish();
-    }, 1500);
+  // Message de victoire
+const winMsg = document.createElement("div");
+
+winMsg.textContent =
+  "🎉 Bravo ! Les cartes rouges étaient les intrus.";
+
+winMsg.style.marginTop = "18px";
+winMsg.style.fontFamily = "Orbitron, sans-serif";
+winMsg.style.fontSize = "20px";
+winMsg.style.color = "#22c55e";
+winMsg.style.textAlign = "center";
+winMsg.style.textShadow =
+  "0 0 10px rgba(34,197,94,0.8)";
+
+container.appendChild(winMsg);
+
+setTimeout(() => {
+  onFinish();
+}, 1800);
   }
 
   // Passer la fonction de révélation comme callback

@@ -173,7 +173,6 @@ export function createMemoryGame(container, onFinish, pairs, pairsToNotDuplicate
     if (onGameFinish) {
       onGameFinish(cards, cardElementsMap);
     } else {
-      alert("Bravo, vous avez gagné !");
       onFinish();
     }
   };
