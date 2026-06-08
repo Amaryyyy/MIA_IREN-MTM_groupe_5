@@ -86,9 +86,6 @@ export default function PlayArea({
     };
   }, [currentLevel, levels.length, onLevelComplete, onNext]);
 
-  const _showPrevious = currentLevel > 0;
-  const _showNext = !finished && currentLevel < levels.length - 1;
-
   return (
     <section className="play-area">
       <h2 className="level-title">{levelTitle}</h2>
@@ -97,7 +94,7 @@ export default function PlayArea({
       )}
       <div ref={containerRef} id="gameContainer" className="game-container" />
       <div className="nav-buttons">
-        <button onClick={onPrevious}>🏠 Accueil</button>
+        {!finished && <button onClick={onPrevious}>🏠 Accueil</button>}
       </div>
     </section>
   );
