@@ -51,7 +51,7 @@ export function startGame16(container, onFinish) {
         size: 4,
         tileSize: 90,
         grid: [],
-        empty: { x: 3, y: 3 },
+        empty: { x: 3, y: 3 }, // Sera écrasé dynamiquement par initTaquin
         moves: 0,
         onFinish,
         status: "PLAYING",
@@ -64,12 +64,56 @@ export function startGame16(container, onFinish) {
     renderTaquin();
 }
 
-/* ------------------ INIT ------------------ */
+/* ------------------ INIT (GARANTI SOLVABLE) ------------------ */
 
 function initTaquin() {
-    const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
-    game14.grid = primes.sort(() => Math.random() - 0.5);
-    game14.grid.push(null);
+    const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, null];
+
+    let grid;
+    let emptyRowFromBottom;
+
+    do {
+        // On mélange le tableau complet contenant les nombres ET la case vide (null)
+        grid = [...primes].sort(() => Math.random() - 0.5);
+
+        // On calcule la position de la case vide depuis le bas (de 1 à 4)
+        const emptyIndex = grid.indexOf(null);
+        const emptyRowFromTop = Math.floor(emptyIndex / 4);
+        emptyRowFromBottom = 4 - emptyRowFromTop;
+
+    } while (!isSolvable(grid, emptyRowFromBottom));
+
+    game14.grid = grid;
+
+    // Mise à jour de la position de la case vide dans l'état global du jeu
+    const finalEmptyIdx = grid.indexOf(null);
+    game14.empty = {
+        x: finalEmptyIdx % 4,
+        y: Math.floor(finalEmptyIdx / 4)
+    };
+}
+
+/* ------------------ CALCUL DE SOLVABILITÉ TAQUIN 4X4 ------------------ */
+
+function isSolvable(arr, emptyRowFromBottom) {
+    let inv = 0;
+    // On ignore la case vide (null) pour compter uniquement les inversions de nombres
+    const justNumbers = arr.filter(x => x !== null);
+
+    for (let i = 0; i < justNumbers.length; i++) {
+        for (let j = i + 1; j < justNumbers.length; j++) {
+            if (justNumbers[i] > justNumbers[j]) inv++;
+        }
+    }
+
+    // Règle mathématique pour un taquin à dimensions paires (4x4) :
+    // - Si la ligne de la case vide (en partant du bas) est IMPAIRE, les inversions doivent être PAIRES.
+    // - Si la ligne de la case vide (en partant du bas) est PAIRE, les inversions doivent être IMPAIRES.
+    if (emptyRowFromBottom % 2 !== 0) {
+        return inv % 2 === 0;
+    } else {
+        return inv % 2 !== 0;
+    }
 }
 
 /* ------------------ CLICK ------------------ */
@@ -102,31 +146,30 @@ function moveTile(x, y) {
     if (!isAdjacent) return;
 
     const idx1 = y * 4 + x;
-    const idx2 = ey * 4 + ex;
-
     const movingValue = game14.grid[idx1];
+    
     const startX = x * game14.tileSize;
     const startY = y * game14.tileSize;
     const endX = ex * game14.tileSize;
     const endY = ey * game14.tileSize;
 
-    [game14.grid[idx1], game14.grid[idx2]] = [game14.grid[idx2], game14.grid[idx1]];
-
-    game14.empty = { x, y };
-    game14.moves++;
-
-    document.getElementById("moves14").textContent = game14.moves;
-
+    // On stocke les indices pour appliquer la permutation à la FIN de l'animation
     game14.animating = true;
     game14.animation = {
         value: movingValue,
+        fromIdx: idx1,
+        toIdx: ey * 4 + ex,
         fromX: startX,
         fromY: startY,
         toX: endX,
         toY: endY,
+        nextEmpty: { x, y },
         start: performance.now(),
-        duration: 40 // <<< ACCÉLÉRATION DE L'ANIMATION (90 → 40)
+        duration: 120 // Animation légèrement adoucie pour le confort visuel
     };
+
+    game14.moves++;
+    document.getElementById("moves14").textContent = game14.moves;
 
     requestAnimationFrame(stepTaquinAnimation);
 }
@@ -157,22 +200,27 @@ function renderTaquin() {
     ctx.fillRect(0, 0, 360, 360);
 
     const anim = game14.animating && game14.animation ? game14.animation : null;
-    const skipX = anim ? Math.round(anim.toX / game14.tileSize) : -1;
-    const skipY = anim ? Math.round(anim.toY / game14.tileSize) : -1;
 
     for (let i = 0; i < 16; i++) {
         const val = game14.grid[i];
+        
+        // Si la case est vide (null), on ne dessine rien
+        if (val === null) continue;
+
+        // Si cette tuile est actuellement en train de bouger, on ignore son dessin statique
+        if (anim && i === anim.fromIdx) continue;
+
         const x = (i % 4) * game14.tileSize;
         const y = Math.floor(i / 4) * game14.tileSize;
-
-        if (val === null) continue;
-        if (anim && (i % 4 === skipX) && (Math.floor(i / 4) === skipY)) continue;
 
         drawTile(val, x, y, 1);
     }
 
+    // On dessine la tuile en mouvement par-dessus les autres avec ses coordonnées fluides
     if (anim) {
-        drawTile(anim.value, anim.currentX ?? anim.fromX, anim.currentY ?? anim.fromY, 1.02);
+        const cx = anim.currentX ?? anim.fromX;
+        const cy = anim.currentY ?? anim.fromY;
+        drawTile(anim.value, cx, cy, 1.04); // Effet de relief discret pendant le mouvement
     }
 }
 
@@ -185,7 +233,8 @@ function stepTaquinAnimation(now) {
     }
 
     const t = Math.min(1, (now - anim.start) / anim.duration);
-    const eased = 1 - Math.pow(1 - t, 3);
+    const eased = 1 - Math.pow(1 - t, 3); // Transition Cubic-Out fluide
+    
     anim.currentX = anim.fromX + (anim.toX - anim.fromX) * eased;
     anim.currentY = anim.fromY + (anim.toY - anim.fromY) * eased;
 
@@ -196,8 +245,13 @@ function stepTaquinAnimation(now) {
         return;
     }
 
+    // L'animation est terminée : on applique physiquement la modification dans la grille
+    [game14.grid[anim.fromIdx], game14.grid[anim.toIdx]] = [game14.grid[anim.toIdx], game14.grid[anim.fromIdx]];
+    game14.empty = anim.nextEmpty;
+
     game14.animating = false;
     game14.animation = null;
+    
     renderTaquin();
     checkPrimeWin();
 }
